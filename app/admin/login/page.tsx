@@ -1,19 +1,51 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, Mail, Shield } from 'lucide-react'
 import Button from '@/components/Button'
+import { useAuth } from '@/lib/auth-context'
 
 export default function AdminLoginPage() {
   const router = useRouter()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const { signIn, user, isAdmin } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Dummy authentication - in production, verify with backend
-    if (credentials.email && credentials.password) {
+  useEffect(() => {
+    // Redirect if already logged in as admin
+    if (user && isAdmin) {
       router.push('/admin')
+    } else if (user && !isAdmin) {
+      router.push('/student')
+    }
+  }, [user, isAdmin, router])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+
+    try {
+      const { error } = await signIn(credentials.email, credentials.password)
+      
+      if (error) {
+        setError(error.message || 'Failed to sign in. Please check your credentials.')
+        return
+      }
+
+      // Check if user is admin after sign in
+      // The useEffect will handle redirect
+      setTimeout(() => {
+        if (!isAdmin) {
+          setError('Access denied. Admin privileges required.')
+        }
+      }, 1000)
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -36,6 +68,12 @@ export default function AdminLoginPage() {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
@@ -47,8 +85,9 @@ export default function AdminLoginPage() {
                   value={credentials.email}
                   onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
                   className="input-field pl-10"
-                  placeholder="admin@sudums tudy.com"
+                  placeholder="admin@example.com"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -66,12 +105,13 @@ export default function AdminLoginPage() {
                   className="input-field pl-10"
                   placeholder="Enter your password"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
 
-            <Button type="submit" variant="primary" className="w-full">
-              Sign In to Admin Panel
+            <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+              {loading ? 'Signing In...' : 'Sign In to Admin Panel'}
             </Button>
           </form>
 

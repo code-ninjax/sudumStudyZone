@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { 
   LayoutDashboard, 
   Users, 
@@ -15,6 +15,7 @@ import {
   Menu,
   X
 } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
@@ -29,6 +30,13 @@ const menuItems = [
 export default function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const { profile, user, signOut } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await signOut()
+    router.push('/admin/login')
+  }
 
   return (
     <>
@@ -55,12 +63,30 @@ export default function AdminSidebar() {
         } lg:translate-x-0`}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
+          {/* Logo & Profile */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h1 className="text-2xl font-bold text-primary-light dark:text-primary-dark">
+            <h1 className="text-2xl font-bold text-primary-light dark:text-primary-dark mb-4">
               Sudum Study
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Admin Panel</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Admin Panel</p>
+            {profile && (
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-light to-accent-light flex items-center justify-center text-white font-bold text-sm">
+                  {(profile.full_name || user?.email || 'A')
+                    .split(' ')
+                    .map((n: string) => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .substring(0, 2)}
+                </div>
+                <div>
+                  <p className="font-semibold text-text-light dark:text-text-dark text-sm">
+                    {profile.full_name || user?.email || 'Admin'}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Administrator</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Menu Items */}
@@ -87,7 +113,10 @@ export default function AdminSidebar() {
 
           {/* Logout */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <button className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 w-full">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 w-full"
+            >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Logout</span>
             </button>

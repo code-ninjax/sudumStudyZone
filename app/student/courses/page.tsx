@@ -5,15 +5,27 @@ import { BookOpen, Clock, Award, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
+import { getStudentEnrolledCourses } from '@/packages/supabase/src/helpers'
 
 export default function StudentCoursesPage() {
   const [loading, setLoading] = useState(true)
+  const [courses, setCourses] = useState<any[]>([])
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000)
+    async function fetchCourses() {
+      try {
+        const data = await getStudentEnrolledCourses()
+        setCourses(data || [])
+      } catch (error) {
+        console.error('Error fetching enrolled courses:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCourses()
   }, [])
 
-  const courses = [
+  const mockCourses = [
     {
       id: 1,
       code: 'CSC301',
@@ -96,7 +108,7 @@ export default function StudentCoursesPage() {
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Enrolled Courses</p>
           <p className="text-3xl font-bold text-text-light dark:text-text-dark">
-            <CountingAnimation end={5} />
+            <CountingAnimation end={courses.length} />
           </p>
         </div>
 
@@ -137,63 +149,40 @@ export default function StudentCoursesPage() {
 
       {/* Courses Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {courses.map((course) => (
-          <div
-            key={course.id}
-            className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <span className="text-sm font-semibold text-primary-light dark:text-primary-dark">
-                  {course.code}
-                </span>
-                <h3 className="text-xl font-bold text-text-light dark:text-text-dark mt-1">
-                  {course.name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {course.instructor}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-semibold">
-                  {course.grade}
-                </span>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-gray-600 dark:text-gray-400">Progress</span>
-                <span className="font-semibold text-primary-light dark:text-primary-dark">
-                  <CountingAnimation end={course.progress} suffix="%" />
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${course.progress}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
-                <CountingAnimation end={course.completedLectures} /> / <CountingAnimation end={course.totalLectures} /> Lectures
-              </span>
-              <span className="text-gray-600 dark:text-gray-400 flex items-center">
-                <Clock className="w-4 h-4 mr-1" />
-                {course.nextClass}
-              </span>
-            </div>
-
-            <Link
-              href={`/courses/${course.code.toLowerCase()}`}
-              className="mt-4 block w-full text-center py-2 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-lg font-medium hover:bg-primary-light/20 dark:hover:bg-primary-dark/20 transition-colors duration-200"
-            >
-              View Course
-            </Link>
+        {courses.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400">You are not enrolled in any courses yet.</p>
           </div>
-        ))}
+        ) : (
+          courses.map((course) => (
+            <div
+              key={course.id}
+              className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-text-light dark:text-text-dark mt-1">
+                    {course.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {course.profiles?.full_name || 'Instructor'}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {course.description || 'No description available.'}
+              </p>
+
+              <Link
+                href={`/courses/${course.slug}`}
+                className="mt-4 block w-full text-center py-2 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-lg font-medium hover:bg-primary-light/20 dark:hover:bg-primary-dark/20 transition-colors duration-200"
+              >
+                View Course
+              </Link>
+            </div>
+          ))
+        )}
       </div>
     </div>
   )

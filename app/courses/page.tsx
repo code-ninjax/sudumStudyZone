@@ -1,9 +1,35 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Card from '@/components/Card'
 import { BookOpen, Clock, Users, Star } from 'lucide-react'
 import Link from 'next/link'
+import { getAllCourses } from '@/packages/supabase/src/helpers'
+import { DashboardSkeleton } from '@/components/SkeletonLoader'
 
 export default function CoursesPage() {
-  const courses = [
+  const [courses, setCourses] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const data = await getAllCourses()
+        setCourses(data || [])
+      } catch (error) {
+        console.error('Error fetching courses:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCourses()
+  }, [])
+
+  if (loading) {
+    return <DashboardSkeleton />
+  }
+
+  const mockCourses = [
     {
       id: 'intro-cs',
       title: 'Introduction to Computer Science',
@@ -87,70 +113,42 @@ export default function CoursesPage() {
 
         {/* Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-slide-up">
-          {courses.map((course) => (
-            <Link key={course.id} href={`/courses/${course.id}`}>
-              <Card className="h-full cursor-pointer group">
-                <div className="flex flex-col h-full">
-                  {/* Level Badge */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                      course.level === 'Beginner' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                      course.level === 'Intermediate' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
-                      'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
-                    }`}>
-                      {course.level}
-                    </span>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{course.rating}</span>
+          {courses.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400">No courses available yet.</p>
+            </div>
+          ) : (
+            courses.map((course) => (
+              <Link key={course.id} href={`/courses/${course.slug}`}>
+                <Card className="h-full cursor-pointer group">
+                  <div className="flex flex-col h-full">
+                    {/* Course Title */}
+                    <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-2 group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors">
+                      {course.title}
+                    </h2>
+
+                    {/* Instructor */}
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      {course.profiles?.full_name || 'Instructor'}
+                    </p>
+
+                    {/* Description */}
+                    <p className="text-gray-700 dark:text-gray-300 mb-4 flex-grow">
+                      {course.description || 'No description available.'}
+                    </p>
+
+                    {/* Meta Info */}
+                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{new Date(course.created_at).toLocaleDateString()}</span>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Course Title */}
-                  <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-2 group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors">
-                    {course.title}
-                  </h2>
-
-                  {/* Instructor */}
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{course.instructor}</p>
-
-                  {/* Description */}
-                  <p className="text-gray-700 dark:text-gray-300 mb-4 flex-grow">
-                    {course.description}
-                  </p>
-
-                  {/* Topics */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {course.topics.slice(0, 3).map((topic, index) => (
-                      <span
-                        key={index}
-                        className="text-xs px-2 py-1 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded"
-                      >
-                        {topic}
-                      </span>
-                    ))}
-                    {course.topics.length > 3 && (
-                      <span className="text-xs px-2 py-1 text-gray-600 dark:text-gray-400">
-                        +{course.topics.length - 3} more
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Meta Info */}
-                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-4 h-4" />
-                      <span>{course.duration}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Users className="w-4 h-4" />
-                      <span>{course.students} students</span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
+                </Card>
+              </Link>
+            ))
+          )}
         </div>
 
         {/* CTA Section */}
