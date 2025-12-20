@@ -11,40 +11,54 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        const apiKey = process.env.GROK_API_KEY
+        const apiKey = process.env.GEMINI_API_KEY
 
         if (!apiKey) {
-            console.error('GROK_API_KEY is not set in environment variables')
+            console.error('GEMINI_API_KEY is not set in environment variables')
             return NextResponse.json(
                 { error: 'AI service is not configured. Please contact administrator.' },
                 { status: 500 }
             )
         }
 
-        // Call Grok API
-        const response = await fetch('https://api.x.ai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are a helpful AI study assistant for students. You help with course questions, study tips, assignment guidance, and general academic support. Be friendly, encouraging, and educational in your responses.',
+        // Convert messages to Gemini format
+        const contents = messages.map((msg: any) => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }],
+        }))
+
+        // Add system instruction at the beginning
+        const systemInstruction = {
+            parts: [
+                {
+                    text: 'You are a helpful AI study assistant for students. You help with course questions, study tips, assignment guidance, and general academic support. Be friendly, encouraging, and educational in your responses.',
+                },
+            ],
+        }
+
+        // Call Gemini API
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    system_instruction: systemInstruction,
+                    contents: contents,
+                    generationConfig: {
+                        temperature: 0.7,
+                        topK: 40,
+                        topP: 0.95,
                     },
-                    ...messages,
-                ],
-                model: 'grok-4-latest',
-                stream: false,
-                temperature: 0.7,
-            }),
-        })
+                }),
+            }
+        )
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}))
-            console.error('Grok API error:', errorData)
+            console.error('Gemini API error:', errorData)
             return NextResponse.json(
                 { error: 'Failed to get AI response. Please try again.' },
                 { status: response.status }
@@ -53,10 +67,11 @@ export async function POST(request: NextRequest) {
 
         const data = await response.json()
 
-        // Extract the AI's response
-        const aiMessage = data.choices?.[0]?.message?.content
+        // Extract the AI's response from Gemini format
+        const aiMessage = data.candidates?.[0]?.content?.parts?.[0]?.text
 
         if (!aiMessage) {
+            console.error('No text found in Gemini response:', data)
             return NextResponse.json(
                 { error: 'No response from AI' },
                 { status: 500 }
@@ -65,7 +80,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ message: aiMessage })
     } catch (error: any) {
-        console.error('Error in Grok API route:', error)
+        console.error('Error in Gemini API route:', error)
         return NextResponse.json(
             { error: error.message || 'An unexpected error occurred' },
             { status: 500 }
