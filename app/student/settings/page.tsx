@@ -1,8 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Bell, Lock, Eye, Globe, Moon, Sun } from 'lucide-react'
+import { Bell, Lock, Eye, Globe, Moon, Sun, Zap } from 'lucide-react'
 import { useTheme } from 'next-themes'
+
+const ComingSoonBadge = () => (
+  <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold rounded-full">
+    <Zap className="w-3 h-3" />
+    Coming Soon
+  </span>
+)
 
 export default function StudentSettingsPage() {
   const { theme, setTheme } = useTheme()
@@ -35,7 +42,10 @@ export default function StudentSettingsPage() {
 
       <div className="space-y-6">
         {/* Notifications */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
+        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6 opacity-60 relative">
+          <div className="absolute top-4 right-4">
+            <ComingSoonBadge />
+          </div>
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-2 bg-blue-500/10 rounded-lg">
               <Bell className="w-6 h-6 text-blue-500" />
@@ -50,13 +60,14 @@ export default function StudentSettingsPage() {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pointer-events-none">
             <div className="flex items-center justify-between p-4 bg-subtle-light dark:bg-gray-800 rounded-lg">
               <div>
                 <h3 className="font-semibold text-text-light dark:text-text-dark">Email Notifications</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Receive notifications via email</p>
               </div>
               <button
+                disabled
                 onClick={() => handleToggle('emailNotifications')}
                 className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
                   settings.emailNotifications ? 'bg-primary-light dark:bg-primary-dark' : 'bg-gray-300 dark:bg-gray-600'
@@ -76,6 +87,7 @@ export default function StudentSettingsPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Receive push notifications on your device</p>
               </div>
               <button
+                disabled
                 onClick={() => handleToggle('pushNotifications')}
                 className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
                   settings.pushNotifications ? 'bg-primary-light dark:bg-primary-dark' : 'bg-gray-300 dark:bg-gray-600'
@@ -95,6 +107,7 @@ export default function StudentSettingsPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Get notified about course changes</p>
               </div>
               <button
+                disabled
                 onClick={() => handleToggle('courseUpdates')}
                 className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
                   settings.courseUpdates ? 'bg-primary-light dark:bg-primary-dark' : 'bg-gray-300 dark:bg-gray-600'
@@ -114,6 +127,7 @@ export default function StudentSettingsPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Reminders for upcoming assignments</p>
               </div>
               <button
+                disabled
                 onClick={() => handleToggle('assignmentReminders')}
                 className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
                   settings.assignmentReminders ? 'bg-primary-light dark:bg-primary-dark' : 'bg-gray-300 dark:bg-gray-600'
@@ -175,7 +189,10 @@ export default function StudentSettingsPage() {
         </div>
 
         {/* Security */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
+        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6 opacity-60 relative">
+          <div className="absolute top-4 right-4">
+            <ComingSoonBadge />
+          </div>
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-2 bg-red-500/10 rounded-lg">
               <Lock className="w-6 h-6 text-red-500" />
@@ -190,13 +207,13 @@ export default function StudentSettingsPage() {
             </div>
           </div>
 
-          <div className="space-y-3">
-            <button className="w-full p-4 bg-subtle-light dark:bg-gray-800 rounded-lg text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+          <div className="space-y-3 pointer-events-none">
+            <button disabled className="w-full p-4 bg-subtle-light dark:bg-gray-800 rounded-lg text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
               <h3 className="font-semibold text-text-light dark:text-text-dark">Change Password</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">Update your password regularly</p>
             </button>
 
-            <button className="w-full p-4 bg-subtle-light dark:bg-gray-800 rounded-lg text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+            <button disabled className="w-full p-4 bg-subtle-light dark:bg-gray-800 rounded-lg text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
               <h3 className="font-semibold text-text-light dark:text-text-dark">Two-Factor Authentication</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security</p>
             </button>
@@ -204,7 +221,10 @@ export default function StudentSettingsPage() {
         </div>
 
         {/* Language */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
+        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6 opacity-60 relative">
+          <div className="absolute top-4 right-4">
+            <ComingSoonBadge />
+          </div>
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-2 bg-green-500/10 rounded-lg">
               <Globe className="w-6 h-6 text-green-500" />
@@ -219,7 +239,7 @@ export default function StudentSettingsPage() {
             </div>
           </div>
 
-          <select className="input-field">
+          <select disabled className="input-field pointer-events-none opacity-60">
             <option>English (US)</option>
             <option>English (UK)</option>
             <option>French</option>

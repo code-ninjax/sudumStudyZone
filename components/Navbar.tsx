@@ -3,15 +3,18 @@
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Menu, X, BookOpen } from 'lucide-react'
+import { Menu, X, BookOpen, User, LogOut } from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
+import { useAuth } from '@/lib/auth-context'
 
 export default function Navbar() {
   const pathname = usePathname()
   // Hide navbar on admin routes
   if (pathname && pathname.startsWith('/admin')) return null
+  if (pathname && pathname.startsWith('/student')) return null
 
   const [isOpen, setIsOpen] = useState(false)
+  const { user, profile, signOut } = useAuth()
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -52,18 +55,39 @@ export default function Navbar() {
           {/* Right Side - Theme Toggle & Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Link
-              href="/auth/login"
-              className="text-primary-light dark:text-primary-dark font-medium hover:opacity-80 transition-opacity"
-            >
-              Login
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="btn-primary"
-            >
-              Sign Up
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/student"
+                  className="flex items-center space-x-2 text-primary-light dark:text-primary-dark font-medium hover:opacity-80 transition-opacity"
+                >
+                  <User className="w-4 h-4" />
+                  <span>{profile?.full_name || 'Dashboard'}</span>
+                </Link>
+                <button
+                  onClick={() => signOut()}
+                  className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 font-medium transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="text-primary-light dark:text-primary-dark font-medium hover:opacity-80 transition-opacity"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="btn-primary"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -94,20 +118,43 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Link
-                  href="/auth/login"
-                  className="text-center py-2 text-primary-light dark:text-primary-dark font-medium"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/auth/signup"
-                  className="btn-primary text-center"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Sign Up
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      href="/student"
+                      className="text-center py-2 text-primary-light dark:text-primary-dark font-medium"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setIsOpen(false)
+                        signOut()
+                      }}
+                      className="text-center py-2 text-red-600 dark:text-red-400 font-medium"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      className="text-center py-2 text-primary-light dark:text-primary-dark font-medium"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/auth/signup"
+                      className="btn-primary text-center"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

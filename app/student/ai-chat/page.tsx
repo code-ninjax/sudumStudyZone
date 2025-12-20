@@ -45,26 +45,53 @@ export default function AIChatPage() {
     setInput('')
     setIsTyping(true)
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const aiResponses = [
-        "That's a great question! Based on your course materials, I'd recommend focusing on understanding the core concepts first before diving into practice problems.",
-        "I can help you with that! Let me break it down into simpler steps for you to understand better.",
-        "According to your study schedule, you're making excellent progress! Keep up the good work.",
-        "Here's a tip: Try using the Pomodoro technique - study for 25 minutes, then take a 5-minute break. It really helps with retention!",
-        "I've noticed you're working on Data Structures. Would you like me to explain any specific topic in more detail?",
-      ]
+    try {
+      // Call our API route which handles Grok AI
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [
+            ...messages.map(m => ({
+              role: m.sender === 'user' ? 'user' : 'assistant',
+              content: m.text
+            })),
+            {
+              role: 'user',
+              content: input
+            }
+          ],
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response')
+      }
+
+      const data = await response.json()
 
       const aiMessage: Message = {
         id: messages.length + 2,
-        text: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+        text: data.message || 'Sorry, I could not generate a response. Please try again.',
         sender: 'ai',
         timestamp: new Date(),
       }
 
       setMessages((prev) => [...prev, aiMessage])
+    } catch (error: any) {
+      console.error('Error calling AI:', error)
+      const errorMessage: Message = {
+        id: messages.length + 2,
+        text: 'Sorry, I encountered an error. Please try again later.',
+        sender: 'ai',
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const quickQuestions = [
@@ -101,21 +128,19 @@ export default function AIChatPage() {
           >
             <div className={`flex items-start space-x-2 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
               {/* Avatar */}
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                message.sender === 'ai' 
-                  ? 'bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark text-white' 
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.sender === 'ai'
+                  ? 'bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}>
+                }`}>
                 {message.sender === 'ai' ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
               </div>
 
               {/* Message Bubble */}
               <div>
-                <div className={`rounded-2xl p-4 ${
-                  message.sender === 'ai'
+                <div className={`rounded-2xl p-4 ${message.sender === 'ai'
                     ? 'bg-gray-100 dark:bg-gray-800 text-text-light dark:text-text-dark'
                     : 'bg-gradient-to-r from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark text-white'
-                }`}>
+                  }`}>
                   <p className="text-sm">{message.text}</p>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 px-2">

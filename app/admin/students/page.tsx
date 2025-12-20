@@ -4,16 +4,47 @@ import { useState, useEffect } from 'react'
 import { Search, Filter, Download, Mail, Eye } from 'lucide-react'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
+import { getAllStudents } from '@/packages/supabase/src/helpers'
 
 export default function AdminStudentsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [students, setStudents] = useState<any[]>([])
+  const [filteredStudents, setFilteredStudents] = useState<any[]>([])
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000)
+    async function fetchStudents() {
+      try {
+        const data = await getAllStudents()
+        setStudents(data || [])
+        setFilteredStudents(data || [])
+      } catch (error) {
+        console.error('Error fetching students:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchStudents()
   }, [])
 
-  const students = [
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredStudents(students)
+    } else {
+      const filtered = students.filter(
+        (student) =>
+          student.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          student.matric_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          student.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          student.faculty?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          student.id?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setFilteredStudents(filtered)
+    }
+  }, [searchQuery, students])
+
+
+  const mockStudents = [
     { id: 1, name: 'John Doe', matricNumber: 'CSC/2020/001', email: 'john@student.edu', level: '300L', cgpa: 3.85, courses: 5, status: 'Active' },
     { id: 2, name: 'Jane Smith', matricNumber: 'CSC/2020/002', email: 'jane@student.edu', level: '300L', cgpa: 3.92, courses: 5, status: 'Active' },
     { id: 3, name: 'Mike Johnson', matricNumber: 'CSC/2020/003', email: 'mike@student.edu', level: '300L', cgpa: 3.45, courses: 4, status: 'Active' },
@@ -46,16 +77,36 @@ export default function AdminStudentsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <div className={`inline-flex p-3 rounded-lg ${stat.bgColor} mb-4`}>
-              <span className={`text-2xl font-bold ${stat.color}`}>
-                {typeof stat.value === 'number' ? <CountingAnimation end={stat.value} /> : stat.value}
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
+          <div className="inline-flex p-3 rounded-lg bg-blue-500/10 mb-4">
+            <span className="text-2xl font-bold text-blue-500">
+              <CountingAnimation end={students.length} />
+            </span>
           </div>
-        ))}
+          <p className="text-sm text-gray-600 dark:text-gray-400">Total Students</p>
+        </div>
+        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
+          <div className="inline-flex p-3 rounded-lg bg-green-500/10 mb-4">
+            <span className="text-2xl font-bold text-green-500">
+              <CountingAnimation end={students.length} />
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Active Students</p>
+        </div>
+        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
+          <div className="inline-flex p-3 rounded-lg bg-purple-500/10 mb-4">
+            <span className="text-2xl font-bold text-purple-500">
+              <CountingAnimation end={0} />
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400">New This Month</p>
+        </div>
+        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
+          <div className="inline-flex p-3 rounded-lg bg-yellow-500/10 mb-4">
+            <span className="text-2xl font-bold text-yellow-500">-</span>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Avg CGPA</p>
+        </div>
       </div>
 
       {/* Search and Filter */}
@@ -67,7 +118,7 @@ export default function AdminStudentsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name or matric number..."
+              placeholder="Search by name, matric number, faculty, or department..."
               className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
             />
           </div>
@@ -95,13 +146,13 @@ export default function AdminStudentsPage() {
                   Matric Number
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                  Level
+                  Faculty
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                  CGPA
+                  Department
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                  Courses
+                  Email
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                   Status
@@ -112,47 +163,50 @@ export default function AdminStudentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {students.map((student) => (
-                <tr key={student.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="font-semibold text-text-light dark:text-text-dark">{student.name}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{student.email}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    {student.matricNumber}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    {student.level}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-semibold text-text-light dark:text-text-dark">{student.cgpa}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    <CountingAnimation end={student.courses} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      student.status === 'Active' 
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'
-                    }`}>
-                      {student.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex items-center space-x-2">
-                      <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                        <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                        <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      </button>
-                    </div>
+              {filteredStudents.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
+                    {searchQuery ? 'No students found matching your search.' : 'No students registered yet.'}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredStudents.map((student) => (
+                  <tr key={student.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="font-semibold text-text-light dark:text-text-dark">
+                        {student.full_name || 'N/A'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {student.matric_number || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {student.faculty || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {student.department || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {student.email || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                        Active
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center space-x-2">
+                        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                          <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                        </button>
+                        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                          <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

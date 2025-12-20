@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -15,8 +15,11 @@ import {
   LogOut,
   Menu,
   X,
-  Bot
+  Bot,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/student' },
@@ -31,7 +34,22 @@ const menuItems = [
 
 export default function StudentSidebar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
+  const { profile, user, signOut } = useAuth()
+  const router = useRouter()
+
+  const initials = (profile?.full_name || user?.email || 'U')
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2)
+
+  const handleLogout = async () => {
+    await signOut()
+    router.push('/auth/login')
+  }
 
   return (
     <>
@@ -53,25 +71,39 @@ export default function StudentSidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-subtle-dark border-r border-gray-200 dark:border-gray-700 z-40 transform transition-transform duration-300 ${
+        className={`fixed top-0 left-0 h-full bg-white dark:bg-subtle-dark border-r border-gray-200 dark:border-gray-700 z-40 transform transition-all duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        } lg:translate-x-0 ${isCollapsed ? 'w-20' : 'w-64'}`}
       >
         <div className="flex flex-col h-full">
           {/* Logo & Profile */}
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h1 className="text-2xl font-bold text-primary-light dark:text-primary-dark mb-4">
-              Sudum Study
-            </h1>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-light to-accent-light flex items-center justify-center text-white font-bold text-lg">
-                JD
-              </div>
-              <div>
-                <p className="font-semibold text-text-light dark:text-text-dark">John Doe</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Student</p>
-              </div>
+          <div className={`p-6 border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${isCollapsed ? 'p-4' : ''}`}>
+            <div className="flex items-center justify-between">
+              {!isCollapsed && (
+                <h1 className="text-2xl font-bold text-primary-light dark:text-primary-dark">
+                  Sudum Study
+                </h1>
+              )}
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="hidden lg:flex items-center justify-center p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+                title={isCollapsed ? 'Expand' : 'Collapse'}
+              >
+                {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+              </button>
             </div>
+            {!isCollapsed && (
+              <div className="mt-4 flex items-center">
+                <div>
+                  <p className="font-semibold text-text-light dark:text-text-dark text-sm">
+                    {profile?.full_name || user?.email || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">
+                    {profile?.role || 'Student'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Menu Items */}
@@ -87,10 +119,11 @@ export default function StudentSidebar() {
                     isActive
                       ? 'bg-primary-light dark:bg-primary-dark text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
+                  } ${isCollapsed ? 'justify-center px-2' : ''}`}
+                  title={isCollapsed ? item.label : undefined}
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  {!isCollapsed && <span className="font-medium">{item.label}</span>}
                 </Link>
               )
             })}
@@ -98,9 +131,13 @@ export default function StudentSidebar() {
 
           {/* Logout */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <button className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 w-full">
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
+            <button 
+              onClick={handleLogout}
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 w-full ${isCollapsed ? 'justify-center px-2 space-x-0' : ''}`}
+              title={isCollapsed ? 'Logout' : undefined}
+            >
+              <LogOut className="w-5 h-5 flex-shrink-0" />
+              {!isCollapsed && <span className="font-medium">Logout</span>}
             </button>
           </div>
         </div>
