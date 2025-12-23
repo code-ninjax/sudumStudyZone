@@ -20,9 +20,9 @@ CREATE POLICY "Users can update their own profile"
   WITH CHECK (auth.uid() = id);
 
 -- Only trigger function can insert profiles (on signup)
-CREATE POLICY "Profiles created via trigger only"
+CREATE POLICY "Users can insert their own profile"
   ON profiles FOR INSERT
-  WITH CHECK (false); -- Disabled, only via trigger
+  WITH CHECK (auth.uid() = id);
 
 -- COURSES TABLE POLICIES
 -- Anyone can read courses

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle2, XCircle, Mail, ArrowRight } from 'lucide-react'
 import Card from '@/components/Card'
@@ -9,7 +9,6 @@ import { supabase } from '@/packages/supabase/src/client'
 
 export default function VerifyEmailPage() {
     const router = useRouter()
-    const searchParams = useSearchParams()
     const [verifying, setVerifying] = useState(true)
     const [verified, setVerified] = useState(false)
     const [error, setError] = useState<string | null>(null)

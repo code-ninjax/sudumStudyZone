@@ -110,10 +110,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     if (!error && data.user) {
-      // Profile will be created automatically by trigger
-      // Wait a bit for trigger to complete
+      // Create profile manually since trigger might not work
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          full_name: fullName,
+          role: 'student',
+          faculty: faculty || null,
+          department: department || null,
+          matric_number: matricNumber || null,
+        })
+
+      if (profileError) {
+        console.error('Error creating profile:', profileError)
+      }
+
+      // Wait a bit for profile to be created
       setTimeout(async () => {
-        await fetchProfile(data.user!.id)
+        await fetchProfile(data.user.id)
       }, 1000)
     }
 

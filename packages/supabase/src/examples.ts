@@ -295,7 +295,7 @@ export async function exampleAdminUploadMaterial(
   });
 
   // Get public URL
-  const publicUrl = getMaterialUrl(STORAGE_BUCKETS.MATERIALS, filePath);
+  const publicUrl = getMaterialUrl('MATERIALS', filePath);
 
   console.log(`File uploaded: ${publicUrl}`);
   return { material, publicUrl, uploadData };
