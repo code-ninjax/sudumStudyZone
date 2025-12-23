@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Bot, User, Sparkles } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 interface Message {
   id: number
   text: string

@@ -116,9 +116,14 @@ export default function AdminLoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               Protected area for administrators only
             </p>
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                <strong>Demo Admin:</strong> admin@studyzone.com / admin123
+              </p>
+            </div>
           </div>
         </div>
       </div>

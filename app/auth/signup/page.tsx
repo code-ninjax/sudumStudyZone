@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Mail, Lock, User, ArrowRight, Hash, Building2, GraduationCap, CheckCircle2, MailOpen } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, CheckCircle2, MailOpen } from 'lucide-react'
 import Input from '@/components/Input'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import { useAuth } from '@/lib/auth-context'
+
+export const dynamic = 'force-dynamic'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -15,9 +17,6 @@ export default function SignupPage() {
     email: '',
     password: '',
     confirmPassword: '',
-    faculty: '',
-    department: '',
-    matricNumber: '',
   })
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -61,10 +60,7 @@ export default function SignupPage() {
       const { error } = await signUp(
         formData.email,
         formData.password,
-        formData.fullName,
-        formData.faculty,
-        formData.department,
-        formData.matricNumber
+        formData.fullName
       )
 
       if (error) {
@@ -218,63 +214,6 @@ export default function SignupPage() {
                     onChange={handleChange}
                     className="input-field pl-10"
                     placeholder="your.email@example.com"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Matric Number
-                </label>
-                <div className="relative">
-                  <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    name="matricNumber"
-                    value={formData.matricNumber}
-                    onChange={handleChange}
-                    className="input-field pl-10"
-                    placeholder="e.g., CSC/2020/001"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Faculty
-                </label>
-                <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    name="faculty"
-                    value={formData.faculty}
-                    onChange={handleChange}
-                    className="input-field pl-10"
-                    placeholder="e.g., Faculty of Science"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Department
-                </label>
-                <div className="relative">
-                  <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleChange}
-                    className="input-field pl-10"
-                    placeholder="e.g., Computer Science"
                     required
                     disabled={loading}
                   />
