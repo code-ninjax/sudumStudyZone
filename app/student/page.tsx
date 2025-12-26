@@ -48,7 +48,7 @@ export default function StudentDashboardPage() {
       const courseIds = enrollments.map((e) => e.course_id)
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
-        .select('id, title, description, slug, instructor_id, created_at, profiles(full_name)')
+        .select('id, title, description, slug, instructor_id, created_at, profiles:instructor_id(full_name)')
         .in('id', courseIds)
 
       if (coursesError) {
@@ -57,13 +57,15 @@ export default function StudentDashboardPage() {
         return
       }
 
-      const coursesWithProgress = coursesData?.map((course) => ({
-        id: course.id,
-        name: course.title,
-        progress: 0, // Progress can be calculated from completion tracking
-        instructor: course.profiles?.full_name || 'Unknown Instructor',
-        lastAccessed: new Date(course.created_at).toLocaleDateString(),
-      })) || []
+ const coursesWithProgress =
+  coursesData?.map((course) => ({
+    id: course.id,
+    name: course.title,
+    progress: 0,
+    instructor: course.profiles?.[0]?.full_name || 'Unknown Instructor',
+    lastAccessed: new Date(course.created_at).toLocaleDateString(),
+  })) || []
+
 
       setCourses(coursesWithProgress)
       setCoursesLoading(false)
@@ -123,7 +125,7 @@ export default function StudentDashboardPage() {
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase())
+    .map((n: string) => n[0]?.toUpperCase())
     .join('') || (displayName || 'ST').slice(0, 2).toUpperCase()
 
   return (

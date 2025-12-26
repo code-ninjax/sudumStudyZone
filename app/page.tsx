@@ -3,6 +3,8 @@ import Card from '@/components/Card'
 import { BookOpen, FileText, Newspaper, Award, Users, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const features = [
     {

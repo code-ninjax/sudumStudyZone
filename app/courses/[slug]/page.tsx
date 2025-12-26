@@ -65,7 +65,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
 
   const handleDownload = (material: any) => {
     if (material.file_path) {
-      const url = getMaterialUrl(STORAGE_BUCKETS.MATERIALS, material.file_path)
+      const url = getMaterialUrl('MATERIALS', material.file_path)
       window.open(url, '_blank')
     }
   }
