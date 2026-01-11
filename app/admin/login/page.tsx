@@ -11,16 +11,31 @@ export default function AdminLoginPage() {
   const [credentials, setCredentials] = useState({ email: '', password: '' })
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const { signIn, user, isAdmin } = useAuth()
+  const { signIn, user, isAdmin, loading: authLoading } = useAuth()
 
   useEffect(() => {
+    // Wait for auth to finish loading
+    if (authLoading) {
+      return
+    }
+
     // Redirect if already logged in as admin
     if (user && isAdmin) {
       router.push('/admin')
-    } else if (user && !isAdmin) {
-      router.push('/student')
+      return
     }
-  }, [user, isAdmin, router])
+
+    // If logged in but not admin, redirect to student
+    if (user && !isAdmin) {
+      // Double check after a brief delay to ensure isAdmin is properly set
+      const timer = setTimeout(() => {
+        if (user && !isAdmin) {
+          router.push('/student')
+        }
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [user, isAdmin, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,19 +47,26 @@ export default function AdminLoginPage() {
       
       if (error) {
         setError(error.message || 'Failed to sign in. Please check your credentials.')
+        setLoading(false)
         return
       }
 
-      // Check if user is admin after sign in
-      // The useEffect will handle redirect
+      // Wait a moment for auth state to update
+      // The useEffect will handle redirect once isAdmin is set
       setTimeout(() => {
+        setLoading(false)
+        // If still not admin after sign in, show error
         if (!isAdmin) {
-          setError('Access denied. Admin privileges required.')
+          // Check again after state updates
+          setTimeout(() => {
+            if (!isAdmin) {
+              setError('Access denied. Admin privileges required.')
+            }
+          }, 500)
         }
-      }, 1000)
+      }, 200)
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred')
-    } finally {
       setLoading(false)
     }
   }

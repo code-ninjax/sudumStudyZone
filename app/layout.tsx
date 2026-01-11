@@ -4,7 +4,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { AuthProvider } from '@/lib/auth-context'
 import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
+import ConditionalFooter from '@/components/ConditionalFooter'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,7 +28,7 @@ export default function RootLayout({
               <main className="flex-grow">
                 {children}
               </main>
-              <Footer />
+              <ConditionalFooter />
             </div>
           </AuthProvider>
         </ThemeProvider>

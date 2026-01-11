@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import AdminSidebar from '@/components/AdminSidebar'
 import ProtectedRoute from '@/components/ProtectedRoute'
 
@@ -8,6 +9,15 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
+  const pathname = usePathname()
+  const isLoginPage = pathname === '/admin/login'
+
+  // Login page should not be protected
+  if (isLoginPage) {
+    return <>{children}</>
+  }
+
+  // All other admin routes require authentication
   return (
     <ProtectedRoute requireAdmin redirectTo="/admin/login">
       <div className="flex h-screen bg-subtle-light dark:bg-background-dark overflow-hidden">
