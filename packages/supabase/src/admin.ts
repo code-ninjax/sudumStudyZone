@@ -1,5 +1,5 @@
-import { supabase } from "./client";
-import type { CreateCourseInput, UpdateCourseInput, CreateMaterialInput, UpdateMaterialInput, CreateAnnouncementInput } from "./types";
+import { supabase, supabaseAdmin } from "./client";
+import type { CreateCourseInput, UpdateCourseInput, CreateMaterialInput, UpdateMaterialInput, CreateAnnouncementInput, CreateBlogPostInput, UpdateBlogPostInput, BlogPost } from "./types";
 
 /**
  * Admin: Create a new course
@@ -282,56 +282,107 @@ export async function bulkEnrollStudents(courseId: string, studentIds: string[])
 export async function getAdminStatistics() {
   try {
     // Get total students count
-    const { count: totalStudents, error: studentsError } = await supabase
+    // Use supabaseAdmin if available to bypass RLS for accurate counts, otherwise use regular client
+    const client = supabaseAdmin || supabase;
+    const { count: totalStudents, error: studentsError } = await client
       .from("profiles")
       .select("*", { count: "exact", head: true })
       .eq("role", "student");
+    
+    if (studentsError) {
+      console.error("Error fetching total students count:", studentsError);
+    }
 
     // Get total courses count
-    const { count: totalCourses, error: coursesError } = await supabase
+    const { count: totalCourses, error: coursesError } = await client
       .from("courses")
       .select("*", { count: "exact", head: true });
 
+    if (coursesError) {
+      console.error("Error fetching total courses count:", coursesError);
+    }
+
     // Get total materials count
-    const { count: totalMaterials, error: materialsError } = await supabase
+    const { count: totalMaterials, error: materialsError } = await client
       .from("materials")
       .select("*", { count: "exact", head: true });
 
+    if (materialsError) {
+      console.error("Error fetching total materials count:", materialsError);
+    }
+
     // Get total enrollments count
-    const { count: totalEnrollments, error: enrollmentsError } = await supabase
+    const { count: totalEnrollments, error: enrollmentsError } = await client
       .from("enrollments")
       .select("*", { count: "exact", head: true });
+
+    if (enrollmentsError) {
+      console.error("Error fetching total enrollments count:", enrollmentsError);
+    }
 
     // Get newly enrolled students (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
-    const { count: newStudents, error: newStudentsError } = await supabase
+    const { count: newStudents, error: newStudentsError } = await client
       .from("profiles")
       .select("*", { count: "exact", head: true })
       .eq("role", "student")
       .gte("created_at", sevenDaysAgo.toISOString());
 
+    if (newStudentsError) {
+      console.error("Error fetching new students count:", newStudentsError);
+    }
+
     // Get newly enrolled in courses (last 7 days)
-    const { count: newEnrollments, error: newEnrollmentsError } = await supabase
+    const { count: newEnrollments, error: newEnrollmentsError } = await client
       .from("enrollments")
       .select("*", { count: "exact", head: true })
       .gte("enrolled_at", sevenDaysAgo.toISOString());
 
+    if (newEnrollmentsError) {
+      console.error("Error fetching new enrollments count:", newEnrollmentsError);
+    }
+
     // Calculate engagement rate (students enrolled in at least one course / total students)
-    const { count: enrolledStudents, error: enrolledStudentsError } = await supabase
+    const { count: enrolledStudents, error: enrolledStudentsError } = await client
       .from("enrollments")
       .select("student_id", { count: "exact", head: true });
 
+    if (enrolledStudentsError) {
+      console.error("Error fetching enrolled students count:", enrolledStudentsError);
+    }
+
     const uniqueEnrolledStudents = new Set();
-    const { data: enrollmentsData } = await supabase
+    const { data: enrollmentsData, error: enrollmentsDataError } = await client
       .from("enrollments")
       .select("student_id");
+    
+    if (enrollmentsDataError) {
+      console.error("Error fetching enrollments data:", enrollmentsDataError);
+    }
     
     enrollmentsData?.forEach((e: any) => uniqueEnrolledStudents.add(e.student_id));
     const engagementRate = totalStudents && totalStudents > 0
       ? Math.round((uniqueEnrolledStudents.size / totalStudents) * 100)
       : 0;
+
+    console.log('getAdminStatistics - Raw results:', {
+      totalStudents,
+      totalCourses,
+      totalMaterials,
+      totalEnrollments,
+      newStudents,
+      usingSupabaseAdmin: !!supabaseAdmin,
+      errors: {
+        students: studentsError,
+        courses: coursesError,
+        materials: materialsError,
+        enrollments: enrollmentsError,
+        newStudents: newStudentsError,
+        newEnrollments: newEnrollmentsError,
+      }
+    });
 
     return {
       totalStudents: totalStudents || 0,
@@ -565,5 +616,152 @@ function getTimeAgo(date: Date): string {
   if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
   return `${Math.floor(seconds / 86400)} days ago`;
+}
+
+/**
+ * Admin: Create a new blog post
+ */
+export async function createBlogPost(
+  authorId: string,
+  postData: CreateBlogPostInput
+) {
+  // Use supabaseAdmin if available to bypass RLS, otherwise use regular client
+  const client = supabaseAdmin || supabase;
+  
+  const { data, error } = await client
+    .from("blog_posts")
+    .insert({
+      title: postData.title,
+      slug: postData.slug,
+      excerpt: postData.excerpt || null,
+      content: postData.content,
+      category: postData.category || 'General',
+      featured_image_url: postData.featured_image_url || null,
+      attachment_url: postData.attachment_url || null,
+      attachment_name: postData.attachment_name || null,
+      author_id: authorId,
+      published: postData.published || false,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating blog post:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Admin: Update a blog post
+ */
+export async function updateBlogPost(
+  postId: string,
+  postData: UpdateBlogPostInput
+) {
+  // Use supabaseAdmin if available to bypass RLS, otherwise use regular client
+  const client = supabaseAdmin || supabase;
+  
+  const { data, error } = await client
+    .from("blog_posts")
+    .update(postData)
+    .eq("id", postId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating blog post:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Admin: Delete a blog post
+ */
+export async function deleteBlogPost(postId: string) {
+  // Use supabaseAdmin if available to bypass RLS, otherwise use regular client
+  const client = supabaseAdmin || supabase;
+  
+  const { error } = await client
+    .from("blog_posts")
+    .delete()
+    .eq("id", postId);
+
+  if (error) {
+    console.error("Error deleting blog post:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get all blog posts (admin can see all, including drafts)
+ */
+export async function getAllBlogPosts(includeDrafts: boolean = false): Promise<BlogPost[]> {
+  let query = supabase
+    .from("blog_posts")
+    .select(`
+      *,
+      profiles:author_id(full_name)
+    `)
+    .order("created_at", { ascending: false });
+
+  if (!includeDrafts) {
+    query = query.eq("published", true);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Error fetching blog posts:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+/**
+ * Get a single blog post by slug
+ */
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select(`
+      *,
+      profiles:author_id(full_name)
+    `)
+    .eq("slug", slug)
+    .eq("published", true)
+    .single();
+
+  if (error) {
+    console.error("Error fetching blog post:", error);
+    return null;
+  }
+
+  return data;
+}
+
+/**
+ * Get a single blog post by ID (admin only, includes drafts)
+ */
+export async function getBlogPostById(postId: string): Promise<BlogPost | null> {
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select(`
+      *,
+      profiles:author_id(full_name)
+    `)
+    .eq("id", postId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching blog post:", error);
+    return null;
+  }
+
+  return data;
 }
 

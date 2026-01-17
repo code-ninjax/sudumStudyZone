@@ -28,6 +28,17 @@ export default function AdminPage() {
       try {
         // Fetch all statistics
         const statistics = await getAdminStatistics()
+        
+        // Log any errors for debugging
+        console.log('Admin Statistics Result:', statistics)
+        if (statistics.errors) {
+          Object.entries(statistics.errors).forEach(([key, error]) => {
+            if (error) {
+              console.error(`Error fetching ${key}:`, error)
+            }
+          })
+        }
+        
         setStats({
           totalStudents: statistics.totalStudents,
           totalCourses: statistics.totalCourses,

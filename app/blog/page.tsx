@@ -1,72 +1,58 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Card from '@/components/Card'
 import { Calendar, User, Clock, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { getAllBlogPosts } from '@/packages/supabase/src/admin'
+import { DashboardSkeleton } from '@/components/SkeletonLoader'
 
 export default function BlogPage() {
-  const posts = [
-    {
-      id: 'effective-study-techniques',
-      title: 'Effective Study Techniques for Computer Science Students',
-      excerpt: 'Discover proven methods to enhance your learning and retention in technical subjects.',
-      author: 'Dr. Sarah Smith',
-      date: '2024-01-15',
-      readTime: '5 min read',
-      category: 'Study Tips',
-      image: 'bg-gradient-to-br from-blue-500 to-blue-700',
-    },
-    {
-      id: 'mastering-algorithms',
-      title: 'Mastering Algorithms: A Step-by-Step Guide',
-      excerpt: 'Learn how to approach algorithm problems systematically and build strong problem-solving skills.',
-      author: 'Prof. Michael Johnson',
-      date: '2024-01-12',
-      readTime: '8 min read',
-      category: 'Algorithms',
-      image: 'bg-gradient-to-br from-green-500 to-green-700',
-    },
-    {
-      id: 'career-in-tech',
-      title: 'Building a Successful Career in Technology',
-      excerpt: 'Essential advice for students preparing to enter the tech industry.',
-      author: 'Dr. Emily Williams',
-      date: '2024-01-10',
-      readTime: '6 min read',
-      category: 'Career',
-      image: 'bg-gradient-to-br from-purple-500 to-purple-700',
-    },
-    {
-      id: 'web-development-trends',
-      title: 'Web Development Trends in 2024',
-      excerpt: 'Stay updated with the latest technologies and frameworks shaping modern web development.',
-      author: 'Prof. David Brown',
-      date: '2024-01-08',
-      readTime: '7 min read',
-      category: 'Web Development',
-      image: 'bg-gradient-to-br from-orange-500 to-orange-700',
-    },
-    {
-      id: 'data-structures-guide',
-      title: 'Understanding Data Structures: A Comprehensive Guide',
-      excerpt: 'Deep dive into fundamental data structures and their real-world applications.',
-      author: 'Dr. Lisa Anderson',
-      date: '2024-01-05',
-      readTime: '10 min read',
-      category: 'Data Structures',
-      image: 'bg-gradient-to-br from-red-500 to-red-700',
-    },
-    {
-      id: 'ai-machine-learning',
-      title: 'Introduction to AI and Machine Learning',
-      excerpt: 'Explore the fascinating world of artificial intelligence and its transformative potential.',
-      author: 'Prof. James Wilson',
-      date: '2024-01-03',
-      readTime: '9 min read',
-      category: 'AI & ML',
-      image: 'bg-gradient-to-br from-indigo-500 to-indigo-700',
-    },
-  ]
+  const [loading, setLoading] = useState(true)
+  const [posts, setPosts] = useState<any[]>([])
+  const [selectedCategory, setSelectedCategory] = useState('All')
 
-  const categories = ['All', 'Study Tips', 'Algorithms', 'Career', 'Web Development', 'Data Structures', 'AI & ML']
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const data = await getAllBlogPosts(false) // Only published posts
+        setPosts(data || [])
+      } catch (error) {
+        console.error('Error fetching blog posts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPosts()
+  }, [])
+
+  // Extract unique categories from posts
+  const categories = ['All', ...Array.from(new Set(posts.map(post => post.category))).filter(Boolean)]
+
+  // Filter posts by category
+  const filteredPosts = selectedCategory === 'All' 
+    ? posts 
+    : posts.filter(post => post.category === selectedCategory)
+
+  // Calculate read time from content (rough estimate: 200 words per minute)
+  const calculateReadTime = (content: string): string => {
+    const wordCount = content.split(/\s+/).length
+    const minutes = Math.ceil(wordCount / 200)
+    return `${minutes} min read`
+  }
+
+  // Format date
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
+  }
+
+  if (loading) {
+    return <DashboardSkeleton />
+  }
 
   return (
     <div className="min-h-screen bg-subtle-light dark:bg-background-dark py-12">
@@ -86,8 +72,9 @@ export default function BlogPage() {
           {categories.map((category) => (
             <button
               key={category}
+              onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                category === 'All'
+                category === selectedCategory
                   ? 'bg-primary-light dark:bg-primary-dark text-white'
                   : 'bg-white dark:bg-subtle-dark text-gray-700 dark:text-gray-300 hover:bg-primary-light/10 dark:hover:bg-primary-dark/10'
               }`}
@@ -99,14 +86,30 @@ export default function BlogPage() {
 
         {/* Blog Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-slide-up">
-          {posts.map((post) => (
-            <Link key={post.id} href={`/blog/${post.id}`}>
+          {filteredPosts.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">No blog posts available yet.</p>
+            </div>
+          ) : (
+            filteredPosts.map((post) => (
+            <Link key={post.id} href={`/blog/${post.slug}`}>
               <Card className="h-full cursor-pointer group">
                 <div className="flex flex-col h-full">
                   {/* Post Image */}
-                  <div className={`${post.image} h-48 rounded-lg mb-4 flex items-center justify-center text-white relative overflow-hidden group-hover:scale-105 transition-transform duration-300`}>
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
-                  </div>
+                  {post.featured_image_url ? (
+                    <div className="h-48 rounded-lg mb-4 relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                      <img 
+                        src={post.featured_image_url} 
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+                    </div>
+                  ) : (
+                    <div className="bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark h-48 rounded-lg mb-4 flex items-center justify-center text-white relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+                    </div>
+                  )}
 
                   {/* Category Badge */}
                   <span className="inline-block text-xs px-3 py-1 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-full mb-3 w-fit">
@@ -120,23 +123,23 @@ export default function BlogPage() {
 
                   {/* Post Excerpt */}
                   <p className="text-gray-700 dark:text-gray-300 mb-4 flex-grow">
-                    {post.excerpt}
+                    {post.excerpt || post.content.substring(0, 150) + '...'}
                   </p>
 
                   {/* Meta Info */}
                   <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                       <User className="w-4 h-4 mr-2" />
-                      <span>{post.author}</span>
+                      <span>{post.profiles?.full_name || 'Admin'}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-2" />
-                        <span>{post.date}</span>
+                        <span>{formatDate(post.created_at)}</span>
                       </div>
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-2" />
-                        <span>{post.readTime}</span>
+                        <span>{calculateReadTime(post.content)}</span>
                       </div>
                     </div>
                   </div>
@@ -151,14 +154,8 @@ export default function BlogPage() {
                 </div>
               </Card>
             </Link>
-          ))}
-        </div>
-
-        {/* Load More */}
-        <div className="text-center mt-12 animate-fade-in">
-          <button className="px-8 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg font-semibold hover:opacity-90 transition-opacity duration-200">
-            Load More Posts
-          </button>
+            ))
+          )}
         </div>
       </div>
     </div>

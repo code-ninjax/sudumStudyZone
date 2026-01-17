@@ -14,40 +14,32 @@ USING (
   AND auth.role() = 'authenticated'
 );
 
--- Only admins can upload files
-CREATE POLICY "Only admins can upload course materials"
+-- Allow authenticated users to upload files
+CREATE POLICY "Authenticated users can upload course materials"
 ON storage.objects FOR INSERT
 WITH CHECK (
   bucket_id = 'course-materials'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 );
 
--- Only admins can update files
-CREATE POLICY "Only admins can update course materials"
+-- Allow authenticated users to update files
+CREATE POLICY "Authenticated users can update course materials"
 ON storage.objects FOR UPDATE
 USING (
   bucket_id = 'course-materials'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 )
 WITH CHECK (
   bucket_id = 'course-materials'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 );
 
--- Only admins can delete files
-CREATE POLICY "Only admins can delete course materials"
+-- Allow authenticated users to delete files
+CREATE POLICY "Authenticated users can delete course materials"
 ON storage.objects FOR DELETE
 USING (
   bucket_id = 'course-materials'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 );
 
 -- ============================================================
@@ -62,39 +54,31 @@ USING (
   AND auth.role() = 'authenticated'
 );
 
--- Only admins can upload files
-CREATE POLICY "Only admins can upload ebooks"
+-- Allow authenticated users to upload files
+CREATE POLICY "Authenticated users can upload ebooks"
 ON storage.objects FOR INSERT
 WITH CHECK (
   bucket_id = 'ebooks'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 );
 
--- Only admins can update files
-CREATE POLICY "Only admins can update ebooks"
+-- Allow authenticated users to update files
+CREATE POLICY "Authenticated users can update ebooks"
 ON storage.objects FOR UPDATE
 USING (
   bucket_id = 'ebooks'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 )
 WITH CHECK (
   bucket_id = 'ebooks'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 );
 
--- Only admins can delete files
-CREATE POLICY "Only admins can delete ebooks"
+-- Allow authenticated users to delete files
+CREATE POLICY "Authenticated users can delete ebooks"
 ON storage.objects FOR DELETE
 USING (
   bucket_id = 'ebooks'
-  AND (
-    SELECT role FROM profiles WHERE id = auth.uid()
-  ) = 'admin'
+  AND auth.role() = 'authenticated'
 );
 

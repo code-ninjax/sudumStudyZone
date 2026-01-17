@@ -30,6 +30,16 @@ export {
   deleteAnnouncement,
   getCourseEnrollments,
   bulkEnrollStudents,
+  getAdminStatistics,
+  getNewlyEnrolledStudents,
+  getRecentEnrollments,
+  getRecentActivities,
+  createBlogPost,
+  updateBlogPost,
+  deleteBlogPost,
+  getAllBlogPosts,
+  getBlogPostBySlug,
+  getBlogPostById,
 } from "./admin";
 
 // Storage functions
@@ -57,5 +67,8 @@ export type {
   UpdateMaterialInput,
   CreateAnnouncementInput,
   UpdateAnnouncementInput,
+  BlogPost,
+  CreateBlogPostInput,
+  UpdateBlogPostInput,
 } from "./types";
 

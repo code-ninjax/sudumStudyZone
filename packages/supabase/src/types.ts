@@ -104,3 +104,46 @@ export interface UpdateAnnouncementInput {
   is_global?: boolean;
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  category: string;
+  featured_image_url: string | null;
+  attachment_url: string | null;
+  attachment_name: string | null;
+  author_id: string;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+  profiles?: {
+    full_name: string | null;
+  };
+}
+
+export interface CreateBlogPostInput {
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  category?: string;
+  featured_image_url?: string;
+  attachment_url?: string;
+  attachment_name?: string;
+  published?: boolean;
+}
+
+export interface UpdateBlogPostInput {
+  title?: string;
+  slug?: string;
+  excerpt?: string;
+  content?: string;
+  category?: string;
+  featured_image_url?: string;
+  attachment_url?: string;
+  attachment_name?: string;
+  published?: boolean;
+}
+

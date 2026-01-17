@@ -97,7 +97,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           fetchProfile(session.user.id)
         } else {
           setLoading(false)
+          setProfile(null)
         }
+      }).catch((error) => {
+        console.error('Error getting session:', error)
+        setLoading(false)
+        setProfile(null)
       })
     }
 
@@ -135,13 +140,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single()
 
+<<<<<<< HEAD
       if (error) throw error
 
       setProfile(data)
+=======
+      if (error) {
+        console.error('Error fetching profile:', error)
+        // If profile doesn't exist, create a default one or handle gracefully
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found for user:', userId)
+        }
+        setProfile(null)
+      } else {
+        setProfile(data)
+      }
+>>>>>>> 2d00d29 (admin fix)
     } catch (error) {
       console.error('Error fetching profile:', error)
       setProfile(null)
     } finally {
+      // Always set loading to false, even if profile fetch fails
       setLoading(false)
     }
   }
