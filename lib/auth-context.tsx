@@ -140,11 +140,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single()
 
-<<<<<<< HEAD
-      if (error) throw error
-
-      setProfile(data)
-=======
       if (error) {
         console.error('Error fetching profile:', error)
         // If profile doesn't exist, create a default one or handle gracefully
@@ -155,7 +150,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setProfile(data)
       }
->>>>>>> 2d00d29 (admin fix)
     } catch (error) {
       console.error('Error fetching profile:', error)
       setProfile(null)

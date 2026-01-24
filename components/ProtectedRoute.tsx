@@ -46,7 +46,7 @@ export default function ProtectedRoute({
       // No profile yet - wait a bit for it to load (but don't redirect immediately)
       // This handles the case where profile is being restored from localStorage
       const timer = setTimeout(() => {
-        if (!profile || profile.role !== 'admin') {
+        if (!profile || (profile as any).role !== 'admin') {
           router.push('/student')
         }
       }, 1000)

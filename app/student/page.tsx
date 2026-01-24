@@ -62,27 +62,15 @@ export default function StudentDashboardPage() {
         return
       }
 
-<<<<<<< HEAD
- const coursesWithProgress =
-  coursesData?.map((course) => ({
-    id: course.id,
-    name: course.title,
-    progress: 0,
-    instructor: course.profiles?.[0]?.full_name || 'Unknown Instructor',
-    lastAccessed: new Date(course.created_at).toLocaleDateString(),
-  })) || []
-
-=======
-      const coursesWithProgress = coursesData?.map((course) => ({
+      const coursesWithProgress = coursesData?.map((course: any) => ({
         id: course.id,
         name: course.title,
-        progress: 0, // Progress can be calculated from completion tracking
+        progress: 0,
         instructor: Array.isArray(course.profiles)
           ? course.profiles[0]?.full_name || 'Unknown Instructor'
-          : course.profiles?.full_name || 'Unknown Instructor',
+          : (course.profiles as any)?.full_name || 'Unknown Instructor',
         lastAccessed: new Date(course.created_at).toLocaleDateString(),
       })) || []
->>>>>>> 2d00d29 (admin fix)
 
       setCourses(coursesWithProgress)
       setCoursesLoading(false)
