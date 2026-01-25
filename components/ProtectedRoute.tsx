@@ -20,35 +20,67 @@ export default function ProtectedRoute({
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push(redirectTo)
-        return
-      }
-
-      if (requireAdmin && !isAdmin) {
-        router.push('/student')
-        return
-      }
-
-      if (!requireAdmin && isAdmin && redirectTo === '/auth/login') {
-        // If admin tries to access student area, redirect to admin
-        router.push('/admin')
-        return
-      }
+    // Always wait for loading to complete
+    if (loading) {
+      return
     }
-  }, [user, loading, isAdmin, requireAdmin, router, redirectTo])
 
+    // No user - redirect to login
+    if (!user) {
+      router.push(redirectTo)
+      return
+    }
+
+    // Admin required routes
+    if (requireAdmin) {
+      // If we have a profile, check role directly
+      if (profile) {
+        if (profile.role !== 'admin') {
+          router.push('/student')
+          return
+        }
+        // Profile exists and role is admin - allow access
+        return
+      }
+      
+      // No profile yet - wait a bit for it to load (but don't redirect immediately)
+      // This handles the case where profile is being restored from localStorage
+      const timer = setTimeout(() => {
+        if (!profile || (profile as any).role !== 'admin') {
+          router.push('/student')
+        }
+      }, 1000)
+      
+      return () => clearTimeout(timer)
+    }
+
+    // If admin tries to access student area, redirect to admin
+    if (!requireAdmin && isAdmin && redirectTo === '/auth/login') {
+      router.push('/admin')
+      return
+    }
+  }, [user, profile, loading, isAdmin, requireAdmin, router, redirectTo])
+
+  // Show loading skeleton while checking auth
   if (loading) {
     return <DashboardSkeleton />
   }
 
+  // No user - return null (redirect will happen in useEffect)
   if (!user) {
     return null
   }
 
-  if (requireAdmin && !isAdmin) {
-    return null
+  // Admin required but not admin - return null (redirect will happen in useEffect)
+  if (requireAdmin) {
+    // Still waiting for profile to load - show skeleton
+    if (!profile) {
+      return <DashboardSkeleton />
+    }
+    // Profile exists but not admin - return null (redirect will happen)
+    if (profile.role !== 'admin') {
+      return null
+    }
   }
 
   return <>{children}</>

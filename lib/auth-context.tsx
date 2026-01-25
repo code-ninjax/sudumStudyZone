@@ -35,26 +35,86 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // INITIAL SESSION + AUTH STATE LISTENER
   // ======================================================
   useEffect(() => {
-    // Only run on client side to prevent SSR issues
-    if (typeof window === 'undefined') {
-      setLoading(false)
-      return
-    }
+    // Check for hardcoded admin session in localStorage first
+    const savedAdminSession = localStorage.getItem('admin-hardcoded-session')
+    if (savedAdminSession) {
+      try {
+        const adminData = JSON.parse(savedAdminSession)
+        
+        // Check if session has expired
+        const now = Math.floor(Date.now() / 1000)
+        if (adminData.expires_at && adminData.expires_at < now) {
+          // Session expired, remove it
+          localStorage.removeItem('admin-hardcoded-session')
+          setLoading(false)
+        } else {
+          // Session is valid, restore it immediately
+          const mockUser = {
+            id: 'admin-hardcoded-id',
+            email: 'sudum@admin',
+          } as User
 
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setUser(data.session?.user ?? null)
+          const mockProfile: Profile = {
+            id: 'admin-hardcoded-id',
+            role: 'admin',
+            full_name: 'Admin User',
+            faculty: null,
+            department: null,
+            matric_number: null,
+            created_at: adminData.created_at,
+            updated_at: adminData.updated_at,
+          }
 
-      if (data.session?.user) {
-        fetchProfile(data.session.user.id)
-      } else {
+          const mockSession: Session = {
+            access_token: 'admin-hardcoded-token',
+            refresh_token: 'admin-hardcoded-refresh',
+            expires_in: 3600 * 24 * 30,
+            expires_at: adminData.expires_at,
+            token_type: 'bearer',
+            user: mockUser,
+          }
+
+          // Set all state synchronously
+          setUser(mockUser)
+          setProfile(mockProfile)
+          setSession(mockSession)
+          setLoading(false)
+          return
+        }
+      } catch (error) {
+        console.error('Error restoring admin session:', error)
+        localStorage.removeItem('admin-hardcoded-session')
         setLoading(false)
       }
-    })
+    }
+
+    // Get initial session from Supabase (only if no admin session was found or expired)
+    if (!savedAdminSession || !localStorage.getItem('admin-hardcoded-session')) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session)
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          fetchProfile(session.user.id)
+        } else {
+          setLoading(false)
+          setProfile(null)
+        }
+      }).catch((error) => {
+        console.error('Error getting session:', error)
+        setLoading(false)
+        setProfile(null)
+      })
+    }
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      // Don't override hardcoded admin session
+      const currentAdminSession = localStorage.getItem('admin-hardcoded-session')
+      if (currentAdminSession) {
+        return
+      }
+      
       setSession(session)
       setUser(session?.user ?? null)
 
@@ -80,13 +140,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single()
 
-      if (error) throw error
-
-      setProfile(data)
+      if (error) {
+        console.error('Error fetching profile:', error)
+        // If profile doesn't exist, create a default one or handle gracefully
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found for user:', userId)
+        }
+        setProfile(null)
+      } else {
+        setProfile(data)
+      }
     } catch (error) {
       console.error('Error fetching profile:', error)
       setProfile(null)
     } finally {
+      // Always set loading to false, even if profile fetch fails
       setLoading(false)
     }
   }
@@ -96,38 +164,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ======================================================
   const signIn = async (email: string, password: string) => {
     // Check for hardcoded admin credentials
-    const isAdminLogin = email === 'admin@studyzone.com' && password === 'admin123'
+    if (email === 'sudum@admin' && password === 'admin') {
+      // Create mock admin user and profile
+      const now = new Date().toISOString()
+      const expiresAt = Math.floor(Date.now() / 1000) + 3600 * 24 * 30 // 30 days
+      
+      const mockUser = {
+        id: 'admin-hardcoded-id',
+        email: 'sudum@admin',
+      } as User
 
-    if (isAdminLogin) {
-      // For admin login, we need to either create the admin user or handle it specially
-      // First try normal login, if it fails, we might need to create the admin account
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        // If admin doesn't exist, we could create it here, but for now let's return the error
-        // In production, you'd want to create the admin account separately
-        return { error }
+      const mockProfile: Profile = {
+        id: 'admin-hardcoded-id',
+        role: 'admin',
+        full_name: 'Admin User',
+        faculty: null,
+        department: null,
+        matric_number: null,
+        created_at: now,
+        updated_at: now,
       }
 
-      if (data.user) {
-        await fetchProfile(data.user.id)
-        // Ensure the profile has admin role
-        if (profile && profile.role !== 'admin') {
-          // Update the profile to admin role
-          await supabase
-            .from('profiles')
-            .update({ role: 'admin' })
-            .eq('id', data.user.id)
-        }
+      const mockSession: Session = {
+        access_token: 'admin-hardcoded-token',
+        refresh_token: 'admin-hardcoded-refresh',
+        expires_in: 3600 * 24 * 30,
+        expires_at: expiresAt,
+        token_type: 'bearer',
+        user: mockUser,
       }
 
-      return { error }
+      // Save to localStorage for persistence
+      localStorage.setItem('admin-hardcoded-session', JSON.stringify({
+        created_at: now,
+        updated_at: now,
+        expires_at: expiresAt,
+      }))
+
+      setUser(mockUser)
+      setProfile(mockProfile)
+      setSession(mockSession)
+      setLoading(false)
+      return { error: null }
     }
 
-    // Normal user login
+    // Normal Supabase authentication for other users
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -184,11 +265,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // SIGN OUT
   // ======================================================
   const signOut = async () => {
-    await supabase.auth.signOut()
+    // Check if it's hardcoded admin by checking localStorage or user ID
+    const savedAdminSession = localStorage.getItem('admin-hardcoded-session')
+    const isHardcodedAdmin = savedAdminSession || user?.id === 'admin-hardcoded-id'
+    
+    // Clear hardcoded admin session first
+    localStorage.removeItem('admin-hardcoded-session')
+    
+    // Clear state immediately
     setUser(null)
     setProfile(null)
     setSession(null)
-    router.push('/auth/login')
+    setLoading(false)
+    
+    // Only sign out from Supabase if it's not a hardcoded admin
+    if (!isHardcodedAdmin) {
+      try {
+        await supabase.auth.signOut()
+      } catch (error) {
+        console.error('Error signing out from Supabase:', error)
+      }
+    }
+    
+    // Redirect to appropriate login page
+    if (isHardcodedAdmin) {
+      router.push('/admin/login')
+    } else {
+      router.push('/auth/login')
+    }
   }
 
   // ======================================================

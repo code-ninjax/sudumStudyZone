@@ -1,4 +1,4 @@
-import { supabase } from "./client";
+import { supabase, supabaseAdmin } from "./client";
 
 export const STORAGE_BUCKETS = {
   MATERIALS: "course-materials",
@@ -7,7 +7,7 @@ export const STORAGE_BUCKETS = {
 
 /**
  * Admin: Upload a file to storage
- * Note: This uses the regular client - RLS policies allow admins to upload
+ * Uses supabaseAdmin if available to bypass storage policies
  */
 export async function uploadMaterial(
   bucket: keyof typeof STORAGE_BUCKETS,
@@ -15,8 +15,11 @@ export async function uploadMaterial(
   file: File | Blob
 ) {
   const bucketName = STORAGE_BUCKETS[bucket];
+  
+  // Use supabaseAdmin if available to bypass storage policies
+  const client = supabaseAdmin || supabase;
 
-  const { data, error } = await supabase.storage
+  const { data, error } = await client.storage
     .from(bucketName)
     .upload(filePath, file, {
       cacheControl: "3600",
@@ -33,14 +36,18 @@ export async function uploadMaterial(
 
 /**
  * Admin: Delete a file from storage
+ * Uses supabaseAdmin if available to bypass storage policies
  */
 export async function deleteMaterialFile(
   bucket: keyof typeof STORAGE_BUCKETS,
   filePath: string
 ) {
   const bucketName = STORAGE_BUCKETS[bucket];
+  
+  // Use supabaseAdmin if available to bypass storage policies
+  const client = supabaseAdmin || supabase;
 
-  const { error } = await supabase.storage
+  const { error } = await client.storage
     .from(bucketName)
     .remove([filePath]);
 
@@ -55,12 +62,16 @@ export async function deleteMaterialFile(
  * Students can use this to download files
  */
 export function getMaterialUrl(
-  bucket: keyof typeof STORAGE_BUCKETS,
+  bucket: keyof typeof STORAGE_BUCKETS | (typeof STORAGE_BUCKETS)[keyof typeof STORAGE_BUCKETS],
   filePath: string
 ): string {
-  const bucketName = STORAGE_BUCKETS[bucket];
+  // Determine if caller passed a key (e.g., 'MATERIALS') or the actual bucket name (e.g., 'course-materials')
+  const bucketValue = (Object.values(STORAGE_BUCKETS) as string[]).includes(bucket as string)
+    ? (bucket as typeof STORAGE_BUCKETS[keyof typeof STORAGE_BUCKETS])
+    : STORAGE_BUCKETS[bucket as keyof typeof STORAGE_BUCKETS];
+
   const { data } = supabase.storage
-    .from(bucketName)
+    .from(bucketValue)
     .getPublicUrl(filePath);
 
   return data.publicUrl;
@@ -91,14 +102,18 @@ export async function getSignedUrl(
 
 /**
  * Admin: List files in a storage bucket
+ * Uses supabaseAdmin if available to bypass storage policies
  */
 export async function listMaterialFiles(
   bucket: keyof typeof STORAGE_BUCKETS,
   path?: string
 ) {
   const bucketName = STORAGE_BUCKETS[bucket];
+  
+  // Use supabaseAdmin if available to bypass storage policies
+  const client = supabaseAdmin || supabase;
 
-  const { data, error } = await supabase.storage
+  const { data, error } = await client.storage
     .from(bucketName)
     .list(path, {
       limit: 100,

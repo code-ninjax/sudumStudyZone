@@ -1,4 +1,4 @@
-import { supabase } from "./client";
+import { supabase, supabaseAdmin } from "./client";
 import type { Profile } from "./types";
 
 /**
@@ -53,7 +53,12 @@ export async function getCurrentUserProfile(): Promise<Profile | null> {
  * Fetch all students (admin only)
  */
 export async function getAllStudents(): Promise<Profile[]> {
-  const { data, error } = await supabase
+  // Use supabaseAdmin if available to bypass RLS, otherwise use regular client
+  const client = supabaseAdmin || supabase;
+  
+  console.log('Fetching students with client:', supabaseAdmin ? 'supabaseAdmin' : 'supabase');
+  
+  const { data, error } = await client
     .from("profiles")
     .select("*")
     .eq("role", "student")
@@ -64,6 +69,7 @@ export async function getAllStudents(): Promise<Profile[]> {
     return [];
   }
 
+  console.log('Successfully fetched students:', data?.length, 'students');
   return data || [];
 }
 

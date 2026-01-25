@@ -4,56 +4,41 @@ import { useState, useEffect } from 'react'
 import { Calendar, Clock, User, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { BlogSkeleton } from '@/components/SkeletonLoader'
+import { getAllBlogPosts } from '@/packages/supabase/src/admin'
 
 export default function StudentBlogPage() {
   const [loading, setLoading] = useState(true)
+  const [posts, setPosts] = useState<any[]>([])
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000)
+    async function fetchPosts() {
+      try {
+        const data = await getAllBlogPosts(false) // Only published posts
+        setPosts(data || [])
+      } catch (error) {
+        console.error('Error fetching blog posts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPosts()
   }, [])
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: '10 Study Tips for Computer Science Students',
-      excerpt: 'Discover effective strategies to excel in your CS courses and manage your time better.',
-      author: 'Dr. Smith',
-      date: 'Jan 15, 2024',
-      readTime: '5 min read',
-      category: 'Study Tips',
-      image: 'study',
-    },
-    {
-      id: 2,
-      title: 'Understanding Data Structures: A Beginner\'s Guide',
-      excerpt: 'Learn the fundamentals of data structures and why they\'re crucial for programming.',
-      author: 'Prof. Johnson',
-      date: 'Jan 12, 2024',
-      readTime: '8 min read',
-      category: 'Computer Science',
-      image: 'code',
-    },
-    {
-      id: 3,
-      title: 'Career Paths in Software Development',
-      excerpt: 'Explore various career opportunities and what skills you need for each path.',
-      author: 'Dr. Williams',
-      date: 'Jan 10, 2024',
-      readTime: '6 min read',
-      category: 'Career',
-      image: 'career',
-    },
-    {
-      id: 4,
-      title: 'Mastering Algorithm Design',
-      excerpt: 'Tips and techniques for designing efficient algorithms and solving complex problems.',
-      author: 'Dr. Brown',
-      date: 'Jan 8, 2024',
-      readTime: '10 min read',
-      category: 'Algorithms',
-      image: 'algorithm',
-    },
-  ]
+  // Format date
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    })
+  }
+
+  // Calculate read time
+  const calculateReadTime = (content: string): string => {
+    const wordCount = content.split(/\s+/).length
+    const minutes = Math.ceil(wordCount / 200)
+    return `${minutes} min read`
+  }
 
   if (loading) {
     return <BlogSkeleton />
@@ -71,53 +56,71 @@ export default function StudentBlogPage() {
       </div>
 
       {/* Blog Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {blogPosts.map((post) => (
-          <div
-            key={post.id}
-            className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
-          >
-            <div className="h-48 bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark"></div>
-            
-            <div className="p-6">
-              <span className="inline-block px-3 py-1 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-full text-sm font-semibold mb-3">
-                {post.category}
-              </span>
-
-              <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-3 hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200">
-                {post.title}
-              </h2>
-
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                {post.excerpt}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-                <div className="flex items-center">
-                  <User className="w-4 h-4 mr-2" />
-                  <span>{post.author}</span>
+      {posts.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
+            No blog posts available yet. Check back soon!
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {posts.map((post) => (
+            <div
+              key={post.id}
+              className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              {post.featured_image_url ? (
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={post.featured_image_url} 
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <span>{post.date}</span>
+              ) : (
+                <div className="h-48 bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark"></div>
+              )}
+              
+              <div className="p-6">
+                <span className="inline-block px-3 py-1 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-full text-sm font-semibold mb-3">
+                  {post.category}
+                </span>
+
+                <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-3 hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200">
+                  {post.title}
+                </h2>
+
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  {post.excerpt || post.content.substring(0, 150) + '...'}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <div className="flex items-center">
+                    <User className="w-4 h-4 mr-2" />
+                    <span>{post.profiles?.full_name || 'Admin'}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    <span>{formatDate(post.created_at)}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span>{calculateReadTime(post.content)}</span>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <Clock className="w-4 h-4 mr-2" />
-                  <span>{post.readTime}</span>
-                </div>
+
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="inline-flex items-center text-primary-light dark:text-primary-dark font-medium hover:underline"
+                >
+                  Read More
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
               </div>
-
-              <Link
-                href={`/blog/${post.id}`}
-                className="inline-flex items-center text-primary-light dark:text-primary-dark font-medium hover:underline"
-              >
-                Read More
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

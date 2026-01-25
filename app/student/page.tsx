@@ -17,9 +17,14 @@ export default function StudentDashboardPage() {
   const [coursesLoading, setCoursesLoading] = useState(true)
 
   useEffect(() => {
-    if (!loading && user?.id) {
-      fetchEnrolledCourses()
-      fetchAssignments()
+    if (!loading) {
+      if (user?.id) {
+        // Run both in parallel instead of sequentially
+        Promise.all([fetchEnrolledCourses(), fetchAssignments()])
+      } else {
+        // No user ID - set loading to false to show content
+        setCoursesLoading(false)
+      }
     }
   }, [loading, user?.id])
 
@@ -44,7 +49,7 @@ export default function StudentDashboardPage() {
         return
       }
 
-      // Fetch course details
+      // Fetch course details in parallel
       const courseIds = enrollments.map((e) => e.course_id)
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
@@ -57,15 +62,15 @@ export default function StudentDashboardPage() {
         return
       }
 
- const coursesWithProgress =
-  coursesData?.map((course) => ({
-    id: course.id,
-    name: course.title,
-    progress: 0,
-    instructor: course.profiles?.[0]?.full_name || 'Unknown Instructor',
-    lastAccessed: new Date(course.created_at).toLocaleDateString(),
-  })) || []
-
+      const coursesWithProgress = coursesData?.map((course: any) => ({
+        id: course.id,
+        name: course.title,
+        progress: 0,
+        instructor: Array.isArray(course.profiles)
+          ? course.profiles[0]?.full_name || 'Unknown Instructor'
+          : (course.profiles as any)?.full_name || 'Unknown Instructor',
+        lastAccessed: new Date(course.created_at).toLocaleDateString(),
+      })) || []
 
       setCourses(coursesWithProgress)
       setCoursesLoading(false)
