@@ -18,8 +18,6 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/courses', label: 'Courses' },
-    { href: '/ebooks', label: 'eBooks' },
     { href: '/blog', label: 'Blog' },
     { href: '/study-hub', label: 'Study Hub' },
     { href: '/about', label: 'About' },

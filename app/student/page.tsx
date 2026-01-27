@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Award, TrendingUp, BookOpen, FileText, Calendar, Target, Flame, Trophy, LogOut } from 'lucide-react'
+import { Award, TrendingUp, BookOpen, FileText, Calendar, Target, Flame, Trophy, LogOut, Clock, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
@@ -66,9 +66,7 @@ export default function StudentDashboardPage() {
         id: course.id,
         name: course.title,
         progress: 0,
-        instructor: Array.isArray(course.profiles)
-          ? course.profiles[0]?.full_name || 'Unknown Instructor'
-          : (course.profiles as any)?.full_name || 'Unknown Instructor',
+        instructor: 'Sir Sudum',
         lastAccessed: new Date(course.created_at).toLocaleDateString(),
       })) || []
 
@@ -108,7 +106,7 @@ export default function StudentDashboardPage() {
   const stats = [
     { icon: Award, label: 'Total Points', value: 0, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10' },
     { icon: Flame, label: 'Day Streak', value: 0, suffix: ' days', color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
-    { icon: BookOpen, label: 'Courses Enrolled', value: courses.length, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+    { icon: BookOpen, label: 'Enrolled Courses', value: courses.length, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
     { icon: FileText, label: 'Assignments', value: assignments.length, suffix: ' pending', color: 'text-red-500', bgColor: 'bg-red-500/10' },
   ]
 
@@ -134,43 +132,65 @@ export default function StudentDashboardPage() {
     .join('') || (displayName || 'ST').slice(0, 2).toUpperCase()
 
   return (
-    <div className="animate-fade-in">
-      {/* Welcome Header with Profile */}
-      <div className="mb-8 bg-gradient-to-r from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark rounded-2xl p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl font-bold border-4 border-white/30 text-white">
-              <span className="inline-block leading-none">{initials}</span>
+    <div className="animate-fade-in max-w-7xl mx-auto">
+      {/* Premium Welcome Hero */}
+      <div className="mb-12 bg-premium-gradient rounded-[2.5rem] p-10 sm:p-14 text-white shadow-3xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-[120px] -mr-64 -mt-64 transition-transform duration-1000 group-hover:scale-110"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-black/10 rounded-full blur-[100px] -ml-40 -mb-40"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+          <div className="flex items-center gap-8">
+            <div className="relative">
+              <div className="w-28 h-28 rounded-3xl overflow-hidden bg-white/20 backdrop-blur-md flex items-center justify-center text-4xl font-black border-2 border-white/30 text-white shadow-inner transform transition-transform duration-700 hover:rotate-6">
+                {initials}
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-black shadow-lg border-4 border-primary-light">
+                < Award className="w-5 h-5" />
+              </div>
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-1">Welcome back, {firstName}!</h1>
-              <p className="opacity-90">Ready to continue your learning journey?</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-4 border border-white/30">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                Student Dynamic
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black mb-3 tracking-tighter uppercase leading-none">
+                Salute, <span className="text-yellow-300">{firstName}!</span>
+              </h1>
+              <p className="text-lg opacity-90 font-medium max-w-xl leading-relaxed">
+                Your intellectual trajectory is climbing. Ready to conquer your <span className="text-yellow-200 font-black">assignments</span> today?
+              </p>
             </div>
           </div>
+          
           <button
             onClick={async () => {
               await signOut()
               router.push('/auth/login')
             }}
-            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-white font-medium transition-colors duration-200 flex items-center gap-2 backdrop-blur-sm border border-white/30"
+            className="group px-8 py-4 bg-white/10 hover:bg-white text-white hover:text-primary-light font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all duration-300 flex items-center gap-3 backdrop-blur-md border border-white/20 hover:scale-105 active:scale-95 shadow-xl"
           >
             <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Sign Out</span>
+            Sign Out
           </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
+      {/* High-End Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`w-6 h-6 ${stat.color}`} />
+          <div key={index} className="bg-white dark:bg-subtle-dark border border-gray-100 dark:border-gray-800 rounded-[2rem] p-8 transition-all duration-500 hover:shadow-[0_30px_60px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_30px_60px_rgba(0,0,0,0.2)] hover:-translate-y-2 group">
+            <div className="flex items-center justify-between mb-6">
+              <div className={`p-4 rounded-2xl ${stat.bgColor} group-hover:scale-110 transition-transform duration-300`}>
+                <stat.icon className={`w-7 h-7 ${stat.color}`} />
+              </div>
+              <div className="flex gap-1">
+                 <div className="w-1 h-3 bg-gray-100 dark:bg-gray-800 rounded-full"></div>
+                 <div className="w-1 h-5 bg-gray-100 dark:bg-gray-800 rounded-full"></div>
+                 <div className="w-1 h-3 bg-gray-100 dark:bg-gray-800 rounded-full"></div>
               </div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{stat.label}</p>
-            <p className="text-3xl font-bold text-text-light dark:text-text-dark">
+            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-[0.25em]">{stat.label}</p>
+            <p className="text-3xl font-black text-text-light dark:text-text-dark tracking-tighter">
               <CountingAnimation
                 end={stat.value}
                 suffix={stat.suffix || ''}
@@ -180,38 +200,49 @@ export default function StudentDashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Recent Courses */}
-          <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-text-light dark:text-text-dark">Continue Learning</h2>
-              <Link href="/student/courses" className="text-primary-light dark:text-primary-dark hover:underline text-sm font-medium">
-                View All
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* Active Assignments Command Area */}
+        <div className="lg:col-span-8 space-y-10">
+          <section className="bg-white dark:bg-subtle-dark rounded-[2.5rem] p-10 border border-gray-100 dark:border-gray-800 shadow-sm">
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="text-2xl font-black text-text-light dark:text-text-dark tracking-tight uppercase">Mission Briefing</h2>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Pending Assignments Overview</p>
+              </div>
+              <Link href="/student/assignments" className="text-[10px] font-black text-primary-light uppercase tracking-[0.25em] border-b-2 border-primary-light pb-1 hover:text-accent-light hover:border-accent-light transition-colors">
+                Deployment Hub
               </Link>
             </div>
+
             {courses.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-slate-500 dark:text-slate-400">No courses enrolled yet</p>
+              <div className="text-center py-20 bg-gray-50/50 dark:bg-gray-800/10 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-400 font-black uppercase tracking-widest text-xs">No active assignments logged so yrr</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {courses.map((course) => (
-                  <div key={course.id} className="p-4 bg-subtle-light dark:bg-gray-800 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer">
-                    <div className="flex items-start justify-between mb-2">
+                  <div key={course.id} className="p-8 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-transparent hover:border-primary-light/30 transition-all duration-300 group">
+                    <div className="flex items-start justify-between mb-6">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-text-light dark:text-text-dark mb-1">{course.name}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{course.instructor}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Enrolled: {course.lastAccessed}</p>
+                        <div className="flex items-center gap-3 mb-2">
+                           <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
+                           <h3 className="text-lg font-black text-text-light dark:text-text-dark tracking-tight leading-tight group-hover:text-primary-light transition-colors">{course.name}</h3>
+                        </div>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-black uppercase tracking-widest flex items-center gap-2">
+                          Commanded by <span className="text-text-light dark:text-text-dark">{course.instructor}</span>
+                        </p>
                       </div>
-                      <span className="text-sm font-medium text-primary-light dark:text-primary-dark">
-                        <CountingAnimation end={course.progress} suffix="%" />
-                      </span>
+                      <div className="text-right">
+                        <p className="text-xl font-black text-primary-light dark:text-primary-dark tracking-tighter">
+                          <CountingAnimation end={course.progress} suffix="%" />
+                        </p>
+                        <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">Completion</p>
+                      </div>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-gray-200 dark:bg-gray-700/50 rounded-full h-3.5 overflow-hidden p-1">
                       <div
-                        className="bg-gradient-to-r from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark h-2 rounded-full transition-all duration-300"
+                        className="bg-premium-gradient h-full rounded-full transition-all duration-1000 ease-out shadow-lg"
                         style={{ width: `${course.progress}%` }}
                       ></div>
                     </div>
@@ -219,77 +250,62 @@ export default function StudentDashboardPage() {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Achievements */}
-          <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-text-light dark:text-text-dark mb-6">Achievements</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {achievements.map((achievement, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-lg text-center transition-all duration-200 ${achievement.unlocked
-                      ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow-lg'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600'
-                    }`}
-                >
-                  <achievement.icon className="w-10 h-10 mx-auto mb-2" />
-                  <h3 className="font-bold text-sm mb-1">{achievement.title}</h3>
-                  <p className="text-xs opacity-80">{achievement.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          </section>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Upcoming Assignments */}
-          <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-4">Upcoming Assignments</h2>
-            {assignments.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-slate-500 dark:text-slate-400">No assignments published yet. Check back soon!</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {assignments.map((assignment) => (
-                  <div key={assignment.id} className="p-3 bg-subtle-light dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow duration-200">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-sm text-text-light dark:text-text-dark flex-1">
-                        {assignment.title}
-                      </h3>
-                      <span className={`text-xs px-2 py-1 rounded-full ${assignment.priority === 'high' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
-                          assignment.priority === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
-                            'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                        }`}>
-                        {assignment.priority}
-                      </span>
+        {/* Intelligence Sidebar */}
+        <div className="lg:col-span-4 space-y-8">
+          {/* Tactical Schedule */}
+          <section className="bg-black text-white dark:bg-white dark:text-black rounded-[2.5rem] p-10 shadow-2xl overflow-hidden relative group">
+            <div className="relative z-10">
+              <h2 className="text-xl font-black uppercase tracking-tight mb-8">Tactical Schedule</h2>
+              {assignments.length === 0 ? (
+                <div className="py-10 text-center opacity-50">
+                  <Calendar className="w-10 h-10 mx-auto mb-4 opacity-20" />
+                  <p className="text-[10px] uppercase font-black tracking-widest">No immediate deadlines</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {assignments.map((assignment) => (
+                    <div key={assignment.id} className="p-5 bg-white/5 dark:bg-black/5 rounded-2xl border border-white/10 dark:border-black/10 hover:bg-white/10 dark:hover:bg-black/10 transition-all group/item">
+                      <div className="flex items-start justify-between mb-4">
+                        <h3 className="font-black text-[10px] uppercase tracking-[0.15em] flex-1 leading-relaxed">
+                          {assignment.title}
+                        </h3>
+                        <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-widest border ${assignment.priority === 'high' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                             'bg-primary-light/20 text-primary-light border-primary-light/30'
+                          }`}>
+                          {assignment.priority}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-primary-light" /> {assignment.due_date}</span>
+                        <ChevronRight className="w-3 h-3 group-hover/item:translate-x-1 transition-transform" />
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{assignment.course}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        Due: {assignment.due_date}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Daily Motivation */}
-          <div className="bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark text-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold mb-2">Daily Motivation</h2>
-            <p className="text-sm opacity-90 mb-4">
-              "The expert in anything was once a beginner. Keep pushing forward!"
-            </p>
-            <div className="flex items-center justify-between text-sm">
-              <span className="opacity-75">Today's Progress</span>
-              <span className="font-bold"><CountingAnimation end={75} suffix="%" /></span>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
+          </section>
+
+          {/* Cognitive Performance */}
+          <section className="bg-white dark:bg-subtle-dark rounded-[2.5rem] p-10 border border-gray-100 dark:border-gray-800 text-center">
+             <div className="w-16 h-16 bg-premium-gradient rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-primary-light/20 rotate-3">
+                <Target className="w-8 h-8" />
+             </div>
+             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-6">Cognitive Load</h3>
+             <div className="relative w-32 h-32 mx-auto mb-8">
+                <svg className="w-full h-full transform -rotate-90">
+                   <circle cx="64" cy="64" r="58" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-gray-50 dark:text-gray-800" />
+                   <circle cx="64" cy="64" r="58" fill="transparent" stroke="currentColor" strokeWidth="8" strokeDasharray="364" strokeDashoffset="91" strokeLinecap="round" className="text-primary-light" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                   <p className="text-2xl font-black tracking-tighter">75%</p>
+                </div>
+             </div>
+             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-relaxed">Optimization required so yrr. Complete pending modules.</p>
+          </section>
         </div>
       </div>
     </div>

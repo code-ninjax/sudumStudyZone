@@ -147,3 +147,47 @@ export interface UpdateBlogPostInput {
   published?: boolean;
 }
 
+
+export interface Assignment {
+  id: string;
+  title: string;
+  description: string | null;
+  course_code: string | null;
+  level: string | null;
+  due_date: string | null;
+  max_score: number;
+  instructor_id: string;
+  created_at: string;
+  updated_at: string;
+  profiles?: {
+    full_name: string | null;
+  };
+}
+
+export interface AssignmentSubmission {
+  id: string;
+  assignment_id: string;
+  student_id: string;
+  file_url: string;
+  file_name: string | null;
+  file_size: number | null;
+  score: number | null;
+  feedback: string | null;
+  submitted_at: string;
+  profiles?: {
+    full_name: string | null;
+    matric_number: string | null;
+  };
+  assignments?: {
+    title: string;
+  };
+}
+
+export interface CreateAssignmentInput {
+  title: string;
+  description?: string;
+  course_code?: string;
+  level?: string;
+  due_date?: string;
+  max_score?: number;
+}

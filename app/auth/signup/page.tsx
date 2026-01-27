@@ -279,11 +279,10 @@ export default function SignupPage() {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full flex items-center justify-center gap-2"
-                disabled={loading}
+                className="w-full"
+                loading={loading}
               >
-                {loading ? 'Creating Account...' : 'Create Account'}
-                {!loading && <ArrowRight className="w-5 h-5" />}
+                Create Account
               </Button>
             </form>
 

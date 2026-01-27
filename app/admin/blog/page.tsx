@@ -5,6 +5,7 @@ import { Save, Image as ImageIcon, Upload, X, FileText } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { createBlogPost } from '@/packages/supabase/src/admin'
 import { uploadMaterial, getMaterialUrl } from '@/packages/supabase/src/storage'
+import Button from '@/components/Button'
 
 export default function AdminBlogPage() {
   const { user, profile } = useAuth()
@@ -135,20 +136,22 @@ export default function AdminBlogPage() {
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark mb-2">
+    <div className="animate-fade-in max-w-4xl mx-auto">
+      {/* Page Header */}
+      <div className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-black text-text-light dark:text-text-dark mb-2 tracking-tight">
           Write Blog Post
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-500 dark:text-gray-400 font-medium">
           Share insights and updates with your students
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Title Card */}
+        <div className="glass-card rounded-[2rem] p-8 relative overflow-hidden group">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary-light/30 to-transparent dark:via-primary-dark/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">
             Post Title
           </label>
           <input
@@ -156,21 +159,22 @@ export default function AdminBlogPage() {
             value={post.title}
             onChange={(e) => setPost({ ...post, title: e.target.value })}
             placeholder="Enter an engaging title..."
-            className="input-field text-2xl font-bold"
+            className="w-full text-2xl md:text-3xl font-black text-text-light dark:text-text-dark bg-transparent border-none focus:outline-none focus:ring-0 placeholder-gray-300 dark:placeholder-gray-600"
             required
           />
         </div>
 
-        {/* Category & Featured Image */}
+        {/* Category & Featured Image Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {/* Category */}
+          <div className="glass-card rounded-[2rem] p-8">
+            <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">
               Category
             </label>
             <select
               value={post.category}
               onChange={(e) => setPost({ ...post, category: e.target.value })}
-              className="input-field"
+              className="w-full py-3 px-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 transition-all duration-300 font-medium"
             >
               <option>Study Tips</option>
               <option>Computer Science</option>
@@ -181,21 +185,22 @@ export default function AdminBlogPage() {
             </select>
           </div>
 
-          <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {/* Featured Image */}
+          <div className="glass-card rounded-[2rem] p-8">
+            <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">
               Featured Image
             </label>
             {featuredImagePreview ? (
-              <div className="relative">
+              <div className="relative group/img">
                 <img 
                   src={featuredImagePreview} 
                   alt="Featured preview" 
-                  className="w-full h-48 object-cover rounded-lg mb-2"
+                  className="w-full h-40 object-cover rounded-2xl"
                 />
                 <button
                   type="button"
                   onClick={removeFeaturedImage}
-                  className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                  className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover/img:opacity-100"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -204,10 +209,10 @@ export default function AdminBlogPage() {
               <button
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
-                className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-light dark:hover:border-primary-dark transition-colors duration-200 flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-400"
+                className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl hover:border-primary-light dark:hover:border-primary-dark transition-all duration-300 flex items-center justify-center gap-3 text-gray-400 hover:text-primary-light dark:hover:text-primary-dark group/btn"
               >
-                <ImageIcon className="w-5 h-5" />
-                <span>Upload Image</span>
+                <ImageIcon className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                <span className="font-bold">Upload Image</span>
               </button>
             )}
             <input
@@ -221,8 +226,8 @@ export default function AdminBlogPage() {
         </div>
 
         {/* Excerpt */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="glass-card rounded-[2rem] p-8">
+          <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">
             Excerpt
           </label>
           <textarea
@@ -230,44 +235,46 @@ export default function AdminBlogPage() {
             onChange={(e) => setPost({ ...post, excerpt: e.target.value })}
             placeholder="Write a brief summary (appears in blog listing)..."
             rows={3}
-            className="input-field resize-none"
+            className="w-full py-3 px-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 transition-all duration-300 resize-none"
             required
           />
         </div>
 
         {/* Content Editor */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Content
-          </label>
+        <div className="glass-card rounded-[2rem] p-8">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+              Content
+            </label>
+            <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Supports Markdown</span>
+          </div>
           <textarea
             value={post.content}
             onChange={(e) => setPost({ ...post, content: e.target.value })}
             placeholder="Write your blog post content here..."
-            rows={15}
-            className="input-field resize-none font-mono"
+            rows={18}
+            className="w-full py-4 px-5 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 transition-all duration-300 resize-none font-mono text-sm leading-relaxed"
             required
           />
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Tip: Use Markdown for formatting (headings, lists, bold, italic, etc.)
-          </p>
         </div>
 
         {/* Attachment Upload */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Attachment File (Optional)
+        <div className="glass-card rounded-[2rem] p-8">
+          <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">
+            Attachment (Optional)
           </label>
           {attachmentPreview ? (
-            <div className="flex items-center justify-between p-4 bg-subtle-light dark:bg-gray-800 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <FileText className="w-5 h-5 text-primary-light dark:text-primary-dark" />
-                <span className="text-text-light dark:text-text-dark">{attachmentPreview}</span>
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary-light/10 dark:bg-primary-dark/10 rounded-xl flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-primary-light dark:text-primary-dark" />
+                </div>
+                <span className="text-text-light dark:text-text-dark font-medium truncate">{attachmentPreview}</span>
               </div>
               <button
                 type="button"
                 onClick={removeAttachment}
-                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -276,10 +283,10 @@ export default function AdminBlogPage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-primary-light dark:hover:border-primary-dark transition-colors duration-200 flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-400"
+              className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl hover:border-primary-light dark:hover:border-primary-dark transition-all duration-300 flex items-center justify-center gap-3 text-gray-400 hover:text-primary-light dark:hover:text-primary-dark group/btn"
             >
-              <Upload className="w-5 h-5" />
-              <span>Upload Attachment</span>
+              <Upload className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+              <span className="font-bold">Upload File</span>
             </button>
           )}
           <input
@@ -288,20 +295,26 @@ export default function AdminBlogPage() {
             onChange={handleAttachmentUpload}
             className="hidden"
           />
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Attach PDF, documents, or other files to your blog post
-          </p>
         </div>
 
         {/* Publish Button */}
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg font-medium hover:opacity-90 transition-opacity duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-10 py-4 bg-primary-light dark:bg-primary-dark text-white rounded-2xl font-bold text-lg shadow-lg shadow-primary-light/25 dark:shadow-primary-dark/10 hover:shadow-primary-light/40 dark:hover:shadow-primary-dark/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center gap-3 disabled:opacity-70 disabled:hover:translate-y-0"
           >
-            <Save className="w-5 h-5" />
-            <span>{loading ? 'Publishing...' : 'Publish Post'}</span>
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Publishing...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                <span>Publish Post</span>
+              </>
+            )}
           </button>
         </div>
       </form>

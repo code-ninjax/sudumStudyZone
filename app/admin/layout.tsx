@@ -22,7 +22,7 @@ export default function AdminLayout({
     <ProtectedRoute requireAdmin redirectTo="/admin/login">
       <div className="flex h-screen bg-subtle-light dark:bg-background-dark overflow-hidden">
         <AdminSidebar />
-        <main className="flex-1 lg:ml-64 overflow-y-auto">
+        <main className="flex-1 lg:ml-80 overflow-y-auto no-scrollbar transition-all duration-500">
           <div className="p-4 lg:p-8">
             {children}
           </div>

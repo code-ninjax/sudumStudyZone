@@ -288,27 +288,27 @@ export async function getAdminStatistics() {
       .from("profiles")
       .select("*", { count: "exact", head: true })
       .eq("role", "student");
-    
+
     if (studentsError) {
       console.error("Error fetching total students count:", studentsError);
     }
 
-    // Get total courses count
-    const { count: totalCourses, error: coursesError } = await client
-      .from("courses")
+    // Get total assignments count
+    const { count: totalAssignments, error: assignmentsError } = await client
+      .from("assignments")
       .select("*", { count: "exact", head: true });
 
-    if (coursesError) {
-      console.error("Error fetching total courses count:", coursesError);
+    if (assignmentsError) {
+      console.error("Error fetching total assignments count:", assignmentsError);
     }
 
-    // Get total materials count
-    const { count: totalMaterials, error: materialsError } = await client
-      .from("materials")
+    // Get total submissions count
+    const { count: totalSubmissions, error: submissionsError } = await client
+      .from("assignment_submissions")
       .select("*", { count: "exact", head: true });
 
-    if (materialsError) {
-      console.error("Error fetching total materials count:", materialsError);
+    if (submissionsError) {
+      console.error("Error fetching total submissions count:", submissionsError);
     }
 
     // Get total enrollments count
@@ -323,7 +323,7 @@ export async function getAdminStatistics() {
     // Get newly enrolled students (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    
+
     const { count: newStudents, error: newStudentsError } = await client
       .from("profiles")
       .select("*", { count: "exact", head: true })
@@ -357,11 +357,11 @@ export async function getAdminStatistics() {
     const { data: enrollmentsData, error: enrollmentsDataError } = await client
       .from("enrollments")
       .select("student_id");
-    
+
     if (enrollmentsDataError) {
       console.error("Error fetching enrollments data:", enrollmentsDataError);
     }
-    
+
     enrollmentsData?.forEach((e: any) => uniqueEnrolledStudents.add(e.student_id));
     const engagementRate = totalStudents && totalStudents > 0
       ? Math.round((uniqueEnrolledStudents.size / totalStudents) * 100)
@@ -369,15 +369,15 @@ export async function getAdminStatistics() {
 
     console.log('getAdminStatistics - Raw results:', {
       totalStudents,
-      totalCourses,
-      totalMaterials,
+      totalAssignments,
+      totalSubmissions,
       totalEnrollments,
       newStudents,
       usingSupabaseAdmin: !!supabaseAdmin,
       errors: {
         students: studentsError,
-        courses: coursesError,
-        materials: materialsError,
+        assignments: assignmentsError,
+        submissions: submissionsError,
         enrollments: enrollmentsError,
         newStudents: newStudentsError,
         newEnrollments: newEnrollmentsError,
@@ -386,16 +386,16 @@ export async function getAdminStatistics() {
 
     return {
       totalStudents: totalStudents || 0,
-      totalCourses: totalCourses || 0,
-      totalMaterials: totalMaterials || 0,
+      totalAssignments: totalAssignments || 0,
+      totalSubmissions: totalSubmissions || 0,
       totalEnrollments: totalEnrollments || 0,
       newStudents: newStudents || 0,
       newEnrollments: newEnrollments || 0,
       engagementRate,
       errors: {
         students: studentsError,
-        courses: coursesError,
-        materials: materialsError,
+        assignments: assignmentsError,
+        submissions: submissionsError,
         enrollments: enrollmentsError,
         newStudents: newStudentsError,
         newEnrollments: newEnrollmentsError,
@@ -611,7 +611,7 @@ export async function getRecentActivities(limit: number = 10) {
  */
 function getTimeAgo(date: Date): string {
   const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-  
+
   if (seconds < 60) return `${seconds} seconds ago`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
@@ -627,7 +627,7 @@ export async function createBlogPost(
 ) {
   // Use supabaseAdmin if available to bypass RLS, otherwise use regular client
   const client = supabaseAdmin || supabase;
-  
+
   const { data, error } = await client
     .from("blog_posts")
     .insert({
@@ -662,7 +662,7 @@ export async function updateBlogPost(
 ) {
   // Use supabaseAdmin if available to bypass RLS, otherwise use regular client
   const client = supabaseAdmin || supabase;
-  
+
   const { data, error } = await client
     .from("blog_posts")
     .update(postData)
@@ -684,7 +684,7 @@ export async function updateBlogPost(
 export async function deleteBlogPost(postId: string) {
   // Use supabaseAdmin if available to bypass RLS, otherwise use regular client
   const client = supabaseAdmin || supabase;
-  
+
   const { error } = await client
     .from("blog_posts")
     .delete()

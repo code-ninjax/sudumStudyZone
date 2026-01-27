@@ -72,80 +72,108 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-accent-light to-primary-light dark:from-primary-dark dark:via-accent-dark dark:to-primary-dark flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-subtle-light dark:bg-background-dark flex items-center justify-center p-4">
+      {/* Background Decorative Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-light/5 dark:bg-primary-dark/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent-light/5 dark:bg-accent-dark/5 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="max-w-md w-full relative z-10 transition-all duration-500">
         {/* Logo & Title */}
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-subtle-dark rounded-full mb-4 shadow-xl">
-            <Shield className="w-10 h-10 text-primary-light dark:text-primary-dark" />
+        <div className="text-center mb-10 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-subtle-dark rounded-2xl mb-6 shadow-xl border border-gray-100 dark:border-white/5 group hover:scale-105 transition-transform duration-300">
+            <Shield className="w-10 h-10 text-primary-light dark:text-primary-dark group-hover:rotate-12 transition-transform" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Sudum Study</h1>
-          <p className="text-white/90">Admin Portal</p>
+          <h1 className="text-4xl font-black text-text-light dark:text-text-dark mb-2 tracking-tight">
+            SUDUM<span className="text-primary-light dark:text-primary-dark">STUDY</span>
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 font-medium tracking-wide uppercase text-xs">Administrative Portal</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white dark:bg-subtle-dark rounded-2xl shadow-2xl p-8 animate-slide-up">
-          <h2 className="text-2xl font-bold text-text-light dark:text-text-dark mb-6">
-            Admin Login
-          </h2>
+        <div className="glass-card rounded-[2rem] p-10 animate-slide-up relative overflow-hidden">
+          {/* Subtle top indicator */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary-light/50 to-transparent dark:via-primary-dark/50" />
+
+          <div className="mb-8">
+            <h2 className="text-2xl font-black text-text-light dark:text-text-dark mb-1">
+              Welcome Back
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Please enter your administrative credentials</p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-2xl animate-shake">
+                <p className="text-sm text-red-600 dark:text-red-400 font-medium flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+                  {error}
+                </p>
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email Address
+            <div className="space-y-2">
+              <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                Admin Email
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-light dark:group-focus-within:text-primary-dark transition-colors" />
                 <input
                   type="email"
                   value={credentials.email}
                   onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                  className="input-field pl-10"
-                  placeholder="admin@example.com"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 focus:bg-white dark:focus:bg-subtle-dark transition-all duration-300"
+                  placeholder="admin@sudumstudy.com"
                   required
                   disabled={loading}
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-1">
+                <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                  Password
+                </label>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-light dark:group-focus-within:text-primary-dark transition-colors" />
                 <input
                   type="password"
                   value={credentials.password}
                   onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-                  className="input-field pl-10"
-                  placeholder="Enter your password"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 focus:bg-white dark:focus:bg-subtle-dark transition-all duration-300"
+                  placeholder="••••••••"
                   required
                   disabled={loading}
                 />
               </div>
             </div>
 
-            <Button type="submit" variant="primary" className="w-full" disabled={loading}>
-              {loading ? 'Signing In...' : 'Sign In to Admin Panel'}
-            </Button>
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full py-4 bg-primary-light dark:bg-primary-dark text-white rounded-2xl font-bold text-lg shadow-lg shadow-primary-light/25 dark:shadow-primary-dark/10 hover:shadow-primary-light/40 dark:hover:shadow-primary-dark/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70 disabled:hover:translate-y-0"
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                <>
+                  <span>Access Portal</span>
+                  <Lock className="w-5 h-5" />
+                </>
+              )}
+            </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              Protected area for administrators only
+          <div className="mt-8 pt-8 border-t border-gray-100 dark:border-white/5 text-center">
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium tracking-tight">
+              Strictly for Authorized Personnel. All sessions are logged.
             </p>
-            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <p className="text-xs text-blue-800 dark:text-blue-200">
-                <strong>Demo Admin:</strong> admin@studyzone.com / admin123
-              </p>
-            </div>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { supabase, supabaseAdmin } from "./client";
 export const STORAGE_BUCKETS = {
   MATERIALS: "course-materials",
   EBOOKS: "ebooks",
+  SUBMISSIONS: "assignment-submissions",
 } as const;
 
 /**
@@ -15,7 +16,7 @@ export async function uploadMaterial(
   file: File | Blob
 ) {
   const bucketName = STORAGE_BUCKETS[bucket];
-  
+
   // Use supabaseAdmin if available to bypass storage policies
   const client = supabaseAdmin || supabase;
 
@@ -43,7 +44,7 @@ export async function deleteMaterialFile(
   filePath: string
 ) {
   const bucketName = STORAGE_BUCKETS[bucket];
-  
+
   // Use supabaseAdmin if available to bypass storage policies
   const client = supabaseAdmin || supabase;
 
@@ -109,7 +110,7 @@ export async function listMaterialFiles(
   path?: string
 ) {
   const bucketName = STORAGE_BUCKETS[bucket];
-  
+
   // Use supabaseAdmin if available to bypass storage policies
   const client = supabaseAdmin || supabase;
 

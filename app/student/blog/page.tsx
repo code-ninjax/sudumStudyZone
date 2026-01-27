@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar, Clock, User, ArrowRight } from 'lucide-react'
+import { Calendar, Clock, User, ArrowRight, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { BlogSkeleton } from '@/components/SkeletonLoader'
 import { getAllBlogPosts } from '@/packages/supabase/src/admin'
@@ -45,79 +45,88 @@ export default function StudentBlogPage() {
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark mb-2">
-          Blog & Articles
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Read insights, tips, and updates from your instructors
-        </p>
+    <div className="animate-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Premium Header */}
+      <div className="mb-14 bg-premium-gradient rounded-3xl p-10 sm:p-14 text-white shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-[100px] -mr-40 -mt-40 transition-transform duration-1000 group-hover:scale-110"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
+        
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-white/30">
+            <div className="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>
+            Intellectual Stream
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black mb-4 tracking-tighter uppercase leading-none">
+            Sudum <span className="text-yellow-300">Insights</span>
+          </h1>
+          <p className="text-lg sm:text-xl opacity-90 font-medium max-w-2xl leading-relaxed">
+            Deep dives, educational breakthroughs, and tactical updates from the Sudum Study hub. Read, absorb, and evolve.
+          </p>
+        </div>
       </div>
 
       {/* Blog Grid */}
       {posts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            No blog posts available yet. Check back soon!
-          </p>
+        <div className="py-24 text-center glass-card rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
+           <FileText className="w-16 h-16 text-gray-200 mx-auto mb-6" />
+           <p className="text-gray-400 font-black uppercase tracking-[0.25em] text-sm">No articles published yet so yrr</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {posts.map((post) => (
-            <div
+            <Link
               key={post.id}
-              className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
+              href={`/blog/${post.slug}`}
+              className="group bg-white dark:bg-subtle-dark rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_40px_80px_rgba(0,0,0,0.3)] hover:-translate-y-2 flex flex-col"
             >
               {post.featured_image_url ? (
-                <div className="h-48 overflow-hidden">
+                <div className="h-64 overflow-hidden relative">
                   <img 
                     src={post.featured_image_url} 
                     alt={post.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
               ) : (
-                <div className="h-48 bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark"></div>
+                <div className="h-64 bg-premium-gradient relative overflow-hidden">
+                   <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
+                </div>
               )}
               
-              <div className="p-6">
-                <span className="inline-block px-3 py-1 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-full text-sm font-semibold mb-3">
-                  {post.category}
-                </span>
+              <div className="p-8 sm:p-10 flex-1 flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="px-3 py-1 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-lg text-[10px] font-black uppercase tracking-widest border border-primary-light/20">
+                    {post.category || 'General'}
+                  </span>
+                  <div className="flex items-center gap-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                    <Clock className="w-3.5 h-3.5" />
+                    {calculateReadTime(post.content)}
+                  </div>
+                </div>
 
-                <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-3 hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200">
+                <h2 className="text-xl sm:text-2xl font-black text-text-light dark:text-text-dark mb-4 tracking-tight leading-snug group-hover:text-primary-light transition-colors">
                   {post.title}
                 </h2>
 
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-gray-500 dark:text-gray-400 mb-8 line-clamp-3 leading-relaxed font-medium">
                   {post.excerpt || post.content.substring(0, 150) + '...'}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  <div className="flex items-center">
-                    <User className="w-4 h-4 mr-2" />
-                    <span>{post.profiles?.full_name || 'Admin'}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span>{formatDate(post.created_at)}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2" />
-                    <span>{calculateReadTime(post.content)}</span>
-                  </div>
+                <div className="mt-auto pt-8 border-t border-gray-50 dark:border-gray-800/50 flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-premium-gradient flex items-center justify-center text-white font-black text-[10px] shadow-md">
+                         {post.profiles?.full_name?.slice(0, 2).toUpperCase() || 'AD'}
+                      </div>
+                      <span className="text-[10px] font-black text-text-light dark:text-text-dark uppercase tracking-widest">{post.profiles?.full_name || 'Admin'}</span>
+                   </div>
+                   <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {formatDate(post.created_at)}
+                   </div>
                 </div>
-
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="inline-flex items-center text-primary-light dark:text-primary-dark font-medium hover:underline"
-                >
-                  Read More
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

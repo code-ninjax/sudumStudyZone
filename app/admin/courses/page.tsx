@@ -58,28 +58,28 @@ export default function AdminCoursesPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark mb-2">
-            Courses Management
+            Assignments Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Create and manage course content
+            Create and manage academic assignments
           </p>
         </div>
         <button className="px-6 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg font-medium hover:opacity-90 transition-opacity duration-200 flex items-center space-x-2">
           <Plus className="w-5 h-5" />
-          <span>Add Course</span>
+          <span>Add Assignment</span>
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
         <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Courses</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Assignments</p>
           <p className="text-3xl font-bold text-text-light dark:text-text-dark">
             <CountingAnimation end={courses.length} />
           </p>
         </div>
         <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Active Courses</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Active Assignments</p>
           <p className="text-3xl font-bold text-text-light dark:text-text-dark">
             <CountingAnimation end={courses.length} />
           </p>

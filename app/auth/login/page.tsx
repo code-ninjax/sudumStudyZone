@@ -127,11 +127,10 @@ export default function LoginPage() {
               <Button 
                 type="submit" 
                 variant="primary" 
-                className="w-full flex items-center justify-center gap-2"
-                disabled={loading}
+                className="w-full"
+                loading={loading}
               >
-                {loading ? 'Signing In...' : 'Sign In'}
-                {!loading && <ArrowRight className="w-5 h-5" />}
+                Sign In
               </Button>
             </form>
 

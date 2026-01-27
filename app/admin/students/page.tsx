@@ -44,21 +44,7 @@ export default function AdminStudentsPage() {
   }, [searchQuery, students])
 
 
-  const mockStudents = [
-    { id: 1, name: 'John Doe', matricNumber: 'CSC/2020/001', email: 'john@student.edu', level: '300L', cgpa: 3.85, courses: 5, status: 'Active' },
-    { id: 2, name: 'Jane Smith', matricNumber: 'CSC/2020/002', email: 'jane@student.edu', level: '300L', cgpa: 3.92, courses: 5, status: 'Active' },
-    { id: 3, name: 'Mike Johnson', matricNumber: 'CSC/2020/003', email: 'mike@student.edu', level: '300L', cgpa: 3.45, courses: 4, status: 'Active' },
-    { id: 4, name: 'Sarah Williams', matricNumber: 'CSC/2020/004', email: 'sarah@student.edu', level: '300L', cgpa: 4.00, courses: 5, status: 'Active' },
-    { id: 5, name: 'David Brown', matricNumber: 'CSC/2020/005', email: 'david@student.edu', level: '200L', cgpa: 3.67, courses: 4, status: 'Active' },
-    { id: 6, name: 'Emily Davis', matricNumber: 'CSC/2020/006', email: 'emily@student.edu', level: '200L', cgpa: 3.78, courses: 4, status: 'Inactive' },
-  ]
 
-  const stats = [
-    { label: 'Total Students', value: 1234, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-    { label: 'Active Students', value: 1180, color: 'text-green-500', bgColor: 'bg-green-500/10' },
-    { label: 'New This Month', value: 45, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
-    { label: 'Avg CGPA', value: '3.72', color: 'text-yellow-500', bgColor: 'bg-yellow-500/10' },
-  ]
 
   if (loading) {
     return <DashboardSkeleton />
@@ -76,7 +62,7 @@ export default function AdminStudentsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
           <div className="inline-flex p-3 rounded-lg bg-blue-500/10 mb-4">
             <span className="text-2xl font-bold text-blue-500">
@@ -100,12 +86,6 @@ export default function AdminStudentsPage() {
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">New This Month</p>
-        </div>
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <div className="inline-flex p-3 rounded-lg bg-yellow-500/10 mb-4">
-            <span className="text-2xl font-bold text-yellow-500">-</span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Avg CGPA</p>
         </div>
       </div>
 

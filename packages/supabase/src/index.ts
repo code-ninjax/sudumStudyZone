@@ -42,6 +42,17 @@ export {
   getBlogPostById,
 } from "./admin";
 
+// Assignment functions
+export {
+  getAllAssignments,
+  getAssignmentById,
+  createAssignment,
+  submitAssignment,
+  getAssignmentSubmissions,
+  gradeSubmission,
+  getStudentSubmission,
+} from "./assignments";
+
 // Storage functions
 export {
   uploadMaterial,
@@ -70,5 +81,8 @@ export type {
   BlogPost,
   CreateBlogPostInput,
   UpdateBlogPostInput,
+  Assignment,
+  AssignmentSubmission,
+  CreateAssignmentInput,
 } from "./types";
 
