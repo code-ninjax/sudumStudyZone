@@ -8,6 +8,7 @@ export interface Profile {
   role: 'admin' | 'student';
   faculty: string | null;
   department: string | null;
+  level: string | null;
   matric_number: string | null;
   created_at: string;
   updated_at: string;
@@ -104,6 +105,14 @@ export interface UpdateAnnouncementInput {
   is_global?: boolean;
 }
 
+export interface BlogCategory {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -111,6 +120,7 @@ export interface BlogPost {
   excerpt: string | null;
   content: string;
   category: string;
+  category_id: string | null;
   featured_image_url: string | null;
   attachment_url: string | null;
   attachment_name: string | null;
@@ -119,8 +129,9 @@ export interface BlogPost {
   created_at: string;
   updated_at: string;
   profiles?: {
-    full_name: string | null;
+    full_name: string;
   };
+  blog_categories?: BlogCategory;
 }
 
 export interface CreateBlogPostInput {
@@ -129,22 +140,40 @@ export interface CreateBlogPostInput {
   excerpt?: string;
   content: string;
   category?: string;
+  category_id?: string;
   featured_image_url?: string;
   attachment_url?: string;
   attachment_name?: string;
   published?: boolean;
 }
 
-export interface UpdateBlogPostInput {
-  title?: string;
-  slug?: string;
-  excerpt?: string;
-  content?: string;
+export interface UpdateBlogPostInput extends Partial<CreateBlogPostInput> { }
+
+export interface EBook {
+  id: string;
+  title: string;
+  author: string | null;
+  category: string | null;
+  pages: number | null;
+  pulls: number;
+  rating: number;
+  rating_count: number;
+  rating_sum: number;
+  cover_image_url: string | null;
+  file_url: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateEBookInput {
+  title: string;
+  author?: string;
   category?: string;
-  featured_image_url?: string;
-  attachment_url?: string;
-  attachment_name?: string;
-  published?: boolean;
+  pages?: number;
+  cover_image_url?: string;
+  file_url: string;
+  description?: string;
 }
 
 

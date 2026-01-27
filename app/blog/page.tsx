@@ -12,66 +12,14 @@ export default function BlogPage() {
   const [posts, setPosts] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState('All')
 
-  // Dummy Fallback Data
-  const dummyPosts = [
-    {
-      id: 'd1',
-      slug: 'physics-of-universe',
-      title: "The Physics of the Universe",
-      excerpt: "Exploring the fundamental laws that govern the cosmos from an astrophysical perspective.",
-      content: "Exploring the fundamental laws that govern the cosmos from an astrophysical perspective.",
-      category: "Science",
-      featured_image_url: "/6035008313579212004.jpg",
-      created_at: new Date().toISOString(),
-      profiles: { full_name: "Dr. Esaenwi Sudum" }
-    },
-    {
-      id: 'd2',
-      slug: 'leadership-modern-missions',
-      title: "Leadership in Modern Missions",
-      excerpt: "How to apply biblical principles to lead effective campus ministry in a digital age.",
-      content: "How to apply biblical principles to lead effective campus ministry in a digital age.",
-      category: "Ministry",
-      featured_image_url: "/6035008313579212003.jpg",
-      created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-      profiles: { full_name: "Dr. Esaenwi Sudum" }
-    },
-    {
-      id: 'd3',
-      slug: 'balancing-faith-research',
-      title: "Balancing Faith and Research",
-      excerpt: "A personal reflection on maintaining spiritual depth while pursuing rigorous academic studies.",
-      content: "A personal reflection on maintaining spiritual depth while pursuing rigorous academic studies.",
-      category: "Academic",
-      featured_image_url: "/6035008313579212004.jpg",
-      created_at: new Date(Date.now() - 86400000 * 12).toISOString(),
-      profiles: { full_name: "Dr. Esaenwi Sudum" }
-    },
-    {
-      id: 'd4',
-      slug: 'astrophysics-career',
-      title: "A Career in Astrophysics",
-      excerpt: "Guidance for young scientists looking to break into the world of astronomy and research.",
-      content: "Guidance for young scientists looking to break into the world of astronomy and research.",
-      category: "Science",
-      featured_image_url: "/6035008313579212003.jpg",
-      created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
-      profiles: { full_name: "Dr. Esaenwi Sudum" }
-    }
-  ]
-
   useEffect(() => {
     async function fetchPosts() {
       try {
         const data = await getAllBlogPosts(false)
-        if (data && data.length > 0) {
-          setPosts(data)
-        } else {
-          setPosts(dummyPosts)
-        }
+        setPosts(data || [])
       } catch (error) {
         console.error('Error fetching blog posts:', error)
-        setPosts(dummyPosts)
+        setPosts([])
       } finally {
         setLoading(false)
       }

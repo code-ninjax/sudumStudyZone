@@ -3,8 +3,10 @@
 import { useState, useRef } from 'react'
 import { Save, Image as ImageIcon, Upload, X, FileText } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
-import { createBlogPost } from '@/packages/supabase/src/admin'
+import { createBlogPost, getBlogCategories } from '@/packages/supabase/src/admin'
 import { uploadMaterial, getMaterialUrl } from '@/packages/supabase/src/storage'
+import { useEffect } from 'react'
+import Link from 'next/link'
 import Button from '@/components/Button'
 
 export default function AdminBlogPage() {
@@ -13,9 +15,12 @@ export default function AdminBlogPage() {
   const imageInputRef = useRef<HTMLInputElement>(null)
   
   const [loading, setLoading] = useState(false)
+  const [categories, setCategories] = useState<any[]>([])
+  const [fetchingCategories, setFetchingCategories] = useState(true)
   const [post, setPost] = useState({
     title: '',
-    category: 'Study Tips',
+    category: 'General',
+    category_id: '',
     content: '',
     excerpt: '',
   })
@@ -23,6 +28,27 @@ export default function AdminBlogPage() {
   const [featuredImagePreview, setFeaturedImagePreview] = useState<string | null>(null)
   const [attachment, setAttachment] = useState<File | null>(null)
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const data = await getBlogCategories()
+        setCategories(data || [])
+        if (data && data.length > 0) {
+          setPost(prev => ({ 
+            ...prev, 
+            category: data[0].name,
+            category_id: data[0].id 
+          }))
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      } finally {
+        setFetchingCategories(false)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   // Generate slug from title
   const generateSlug = (title: string): string => {
@@ -108,6 +134,7 @@ export default function AdminBlogPage() {
         excerpt: post.excerpt,
         content: post.content,
         category: post.category,
+        category_id: post.category_id,
         featured_image_url: featuredImageUrl,
         attachment_url: attachmentUrl,
         attachment_name: attachmentName,
@@ -119,7 +146,8 @@ export default function AdminBlogPage() {
       // Reset form
       setPost({
         title: '',
-        category: 'Study Tips',
+        category: categories[0]?.name || 'General',
+        category_id: categories[0]?.id || '',
         content: '',
         excerpt: '',
       })
@@ -138,13 +166,22 @@ export default function AdminBlogPage() {
   return (
     <div className="animate-fade-in max-w-4xl mx-auto">
       {/* Page Header */}
-      <div className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-black text-text-light dark:text-text-dark mb-2 tracking-tight">
-          Write Blog Post
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 font-medium">
-          Share insights and updates with your students
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-black text-text-light dark:text-text-dark mb-2 tracking-tight">
+            Write Blog Post
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">
+            Share insights and updates with your students
+          </p>
+        </div>
+        <Link 
+          href="/admin/blog/manage"
+          className="px-6 py-3 bg-gray-50 dark:bg-white/5 text-gray-500 dark:text-gray-400 rounded-xl font-black uppercase tracking-widest text-[10px] border border-gray-100 dark:border-white/5 hover:bg-gray-100 transition-all flex items-center gap-2"
+        >
+          <FileText className="w-4 h-4" />
+          Manage Posts
+        </Link>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -172,16 +209,30 @@ export default function AdminBlogPage() {
               Category
             </label>
             <select
-              value={post.category}
-              onChange={(e) => setPost({ ...post, category: e.target.value })}
+              value={post.category_id}
+              onChange={(e) => {
+                const selectedCat = categories.find(c => c.id === e.target.value)
+                setPost({ 
+                  ...post, 
+                  category_id: e.target.value,
+                  category: selectedCat?.name || 'General'
+                })
+              }}
               className="w-full py-3 px-4 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary-light/20 dark:focus:ring-primary-dark/20 transition-all duration-300 font-medium"
             >
-              <option>Study Tips</option>
-              <option>Computer Science</option>
-              <option>Career</option>
-              <option>Algorithms</option>
-              <option>Programming</option>
-              <option>Announcements</option>
+              {fetchingCategories ? (
+                <option value="" className="bg-white dark:bg-gray-800 text-text-light dark:text-text-dark">Loading categories...</option>
+              ) : (
+                categories.map(cat => (
+                  <option 
+                    key={cat.id} 
+                    value={cat.id}
+                    className="bg-white dark:bg-gray-800 text-text-light dark:text-text-dark"
+                  >
+                    {cat.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

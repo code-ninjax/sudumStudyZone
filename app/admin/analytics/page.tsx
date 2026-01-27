@@ -1,161 +1,54 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Eye, Users, BookOpen, TrendingUp, Clock, Award } from 'lucide-react'
-import CountingAnimation from '@/components/CountingAnimation'
-import { DashboardSkeleton } from '@/components/SkeletonLoader'
+import { BarChart3, ShieldCheck, Activity, Zap, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
-export default function AdminAnalyticsPage() {
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 1000)
-  }, [])
-
-  const stats = [
-    { label: 'Total Page Views', value: 15678, icon: Eye, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-    { label: 'Active Users', value: 1180, icon: Users, color: 'text-green-500', bgColor: 'bg-green-500/10' },
-    { label: 'Course Enrollments', value: 886, icon: BookOpen, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
-    { label: 'Engagement Rate', value: 87, suffix: '%', icon: TrendingUp, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
-  ]
-
-  const topCourses = [
-    { name: 'Web Development Fundamentals', students: 189, engagement: 92 },
-    { name: 'Software Engineering', students: 167, engagement: 88 },
-    { name: 'Introduction to Computer Science', students: 156, engagement: 85 },
-    { name: 'Data Structures & Algorithms', students: 142, engagement: 90 },
-    { name: 'Database Management Systems', students: 134, engagement: 82 },
-  ]
-
-  const userActivity = [
-    { day: 'Mon', users: 450 },
-    { day: 'Tue', users: 520 },
-    { day: 'Wed', users: 480 },
-    { day: 'Thu', users: 550 },
-    { day: 'Fri', users: 600 },
-    { day: 'Sat', users: 320 },
-    { day: 'Sun', users: 280 },
-  ]
-
-  if (loading) {
-    return <DashboardSkeleton />
-  }
-
+export default function AdminAnalyticsComingSoon() {
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark mb-2">
-          Analytics & Insights
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Monitor platform performance and user engagement
-        </p>
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center animate-fade-in">
+      <div className="relative mb-12 group">
+        <div className="absolute inset-0 bg-primary-light/20 blur-[100px] rounded-full group-hover:bg-primary-light/40 transition-all duration-1000"></div>
+        <div className="relative w-32 h-32 bg-white dark:bg-subtle-dark rounded-[2.5rem] flex items-center justify-center shadow-3xl border border-gray-100 dark:border-white/5 transform group-hover:rotate-6 transition-transform duration-500">
+           <BarChart3 className="w-14 h-14 text-primary-light animate-pulse" />
+        </div>
+        <div className="absolute -top-4 -right-4 w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-black shadow-xl border-4 border-white dark:border-subtle-dark">
+           <Zap className="w-5 h-5 fill-current" />
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <div className={`inline-flex p-3 rounded-lg ${stat.bgColor} mb-4`}>
-              <stat.icon className={`w-6 h-6 ${stat.color}`} />
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{stat.label}</p>
-            <p className="text-3xl font-bold text-text-light dark:text-text-dark">
-              <CountingAnimation end={stat.value} suffix={stat.suffix || ''} />
-            </p>
+      <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light/10 text-primary-light rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-primary-light/20">
+        <ShieldCheck className="w-4 h-4" />
+        Intelligence Matrix Alpha
+      </div>
+
+      <h1 className="text-4xl md:text-6xl font-black text-text-light dark:text-text-dark mb-6 tracking-tighter uppercase leading-none max-w-2xl">
+        Predictive <span className="text-premium-gradient bg-clip-text text-transparent">Analytics</span> is coming
+      </h1>
+
+      <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium max-w-xl mx-auto leading-relaxed mb-12">
+        We're building a neural command center to track student growth, resource alpha, and academic performance with military precision.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12 w-full max-w-2xl">
+        {[
+          { label: 'Growth Tracing', icon: Activity },
+          { label: 'Resource ROI', icon: Zap },
+          { label: 'Neural Insights', icon: ShieldCheck }
+        ].map((feat, i) => (
+          <div key={i} className="p-6 bg-white dark:bg-subtle-dark rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm flex flex-col items-center gap-3">
+            <feat.icon className="w-6 h-6 text-primary-light/40" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{feat.label}</span>
           </div>
         ))}
       </div>
 
-      {/* User Activity Chart */}
-      <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6 mb-8">
-        <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-6">
-          Weekly User Activity
-        </h2>
-        <div className="flex items-end justify-between space-x-4 h-64">
-          {userActivity.map((data, index) => (
-            <div key={index} className="flex-1 flex flex-col items-center">
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-t-lg relative" style={{ height: `${(data.users / 600) * 100}%` }}>
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-500 to-purple-500 rounded-t-lg"></div>
-              </div>
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">{data.day}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-500"><CountingAnimation end={data.users} /></p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Top Courses */}
-        <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-text-light dark:text-text-dark mb-6">
-            Top Performing Courses
-          </h2>
-          <div className="space-y-4">
-            {topCourses.map((course, index) => (
-              <div key={index} className="p-4 bg-subtle-light dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-text-light dark:text-text-dark">{course.name}</h3>
-                  <span className="text-sm font-semibold text-primary-light dark:text-primary-dark">
-                    #{index + 1}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  <span><CountingAnimation end={course.students} /> students</span>
-                  <span><CountingAnimation end={course.engagement} />% engagement</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark h-2 rounded-full"
-                    style={{ width: `${course.engagement}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-3 rounded-lg bg-yellow-500/10">
-                <Clock className="w-6 h-6 text-yellow-500" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-text-light dark:text-text-dark">Avg Study Time</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Per student per week</p>
-              </div>
-            </div>
-            <p className="text-4xl font-bold text-text-light dark:text-text-dark">
-              <CountingAnimation end={12} suffix="h" />
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-subtle-dark rounded-xl shadow-lg p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-3 rounded-lg bg-green-500/10">
-                <Award className="w-6 h-6 text-green-500" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-text-light dark:text-text-dark">Completion Rate</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Course completion average</p>
-              </div>
-            </div>
-            <p className="text-4xl font-bold text-text-light dark:text-text-dark">
-              <CountingAnimation end={78} suffix="%" />
-            </p>
-          </div>
-
-          <div className="bg-gradient-to-br from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark text-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-bold mb-2">Platform Growth</h3>
-            <p className="text-3xl font-bold mb-1">
-              <CountingAnimation end={24} suffix="%" />
-            </p>
-            <p className="text-sm opacity-90">Increase in active users this month</p>
-          </div>
-        </div>
-      </div>
+      <Link 
+        href="/admin"
+        className="px-10 py-5 bg-premium-gradient text-white rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] shadow-3xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Return to Command Center
+      </Link>
     </div>
   )
 }

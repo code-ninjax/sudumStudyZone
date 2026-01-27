@@ -6,6 +6,7 @@ import Link from 'next/link'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
 import { getAdminStatistics, getRecentActivities, getNewlyEnrolledStudents, getRecentEnrollments } from '@/packages/supabase/src/admin'
+import { getMaintenanceMode, setMaintenanceMode } from '@/packages/supabase/src/settings'
 import { getAllCourses } from '@/packages/supabase/src/helpers'
 import type { Profile } from '@/packages/supabase/src/types'
 
@@ -92,9 +93,31 @@ export default function AdminPage() {
         
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.25em] mb-6 border border-white/30">
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-              Operations Active
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.25em] border border-white/30">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                Operations Active
+              </div>
+              
+              {/* Maintenance Toggle */}
+              <button 
+                onClick={async () => {
+                  const current = await getMaintenanceMode()
+                  const newState = !current.enabled
+                  const confirmMsg = newState 
+                    ? "ARE YOU ABSOLUTELY SURE? Enabling Maintenance Mode will instantly block all student and guest access to the platform." 
+                    : "Restore platform access for all users?"
+                  
+                  if (confirm(confirmMsg)) {
+                    await setMaintenanceMode(newState, "System is undergoing scheduled maintenance.")
+                    alert(`Maintenance Mode is now ${newState ? 'ACTIVE' : 'INACTIVE'}`)
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-500/20 hover:bg-red-500/40 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-[0.25em] border border-red-500/30 transition-all text-red-200"
+              >
+                <TrendingUp className="w-3 h-3 rotate-180" />
+                Maintenance Toggle
+              </button>
             </div>
             <h1 className="text-3xl sm:text-5xl font-black mb-6 tracking-tighter uppercase leading-none">
               Control <span className="text-yellow-300">Station</span>

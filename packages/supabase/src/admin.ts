@@ -636,6 +636,7 @@ export async function createBlogPost(
       excerpt: postData.excerpt || null,
       content: postData.content,
       category: postData.category || 'General',
+      category_id: postData.category_id || null,
       featured_image_url: postData.featured_image_url || null,
       attachment_url: postData.attachment_url || null,
       attachment_name: postData.attachment_name || null,
@@ -760,6 +761,75 @@ export async function getBlogPostById(postId: string): Promise<BlogPost | null> 
   if (error) {
     console.error("Error fetching blog post:", error);
     return null;
+  }
+
+  return data;
+}
+
+/**
+ * Admin: Get all blog categories
+ */
+export async function getBlogCategories() {
+  const { data, error } = await supabase
+    .from("blog_categories")
+    .select("*")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching blog categories:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+/**
+ * Admin: Create a blog category
+ */
+export async function createBlogCategory(name: string, slug: string) {
+  const { data, error } = await supabase
+    .from("blog_categories")
+    .insert({ name, slug })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating blog category:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Admin: Delete a blog category
+ */
+export async function deleteBlogCategory(id: string) {
+  const { error } = await supabase
+    .from("blog_categories")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting blog category:", error);
+    throw error;
+  }
+}
+
+/**
+ * Admin: Update a blog category
+ */
+export async function updateBlogCategory(id: string, name: string, slug: string) {
+  const { data, error } = await supabase
+    .from("blog_categories")
+    .update({ name, slug })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating blog category:", error);
+    throw error;
   }
 
   return data;

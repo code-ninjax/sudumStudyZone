@@ -9,9 +9,19 @@ import ConditionalFooter from '@/components/ConditionalFooter'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Academic Platform - Where Learning Meets Growth',
+  title: 'Sudum Study Zone - Academic & Leadership Portal',
   description: 'An academic space curated by dedicated educators, sharing educational materials, resources, and insights.',
+  manifest: '/manifest.json',
+  themeColor: '#4f46e5',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SudumStudy',
+  },
 }
+
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 
 export default function RootLayout({
   children,
@@ -29,6 +39,7 @@ export default function RootLayout({
                 {children}
               </main>
               <ConditionalFooter />
+              <PWAInstallPrompt />
             </div>
           </AuthProvider>
         </ThemeProvider>

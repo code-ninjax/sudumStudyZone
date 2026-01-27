@@ -1,21 +1,63 @@
 'use client'
 
-import { useState } from 'react'
-import { Save, Globe, Bell, Shield, Database } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Save, Globe, Bell, Shield, Database, Loader2 } from 'lucide-react'
+import { getMaintenanceMode, setMaintenanceMode } from '@/packages/supabase/src/settings'
+import { supabase } from '@/packages/supabase/src/client'
 
 export default function AdminSettingsPage() {
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [settings, setSettings] = useState({
     siteName: 'Sudum Study',
     siteDescription: 'Academic Learning Platform',
-    contactEmail: 'admin@sudums tudy.com',
+    contactEmail: 'admin@sudumstudy.com',
     allowRegistration: true,
     requireEmailVerification: true,
     maintenanceMode: false,
+    maintenanceMessage: "The system is currently undergoing maintenance. Please check back later."
   })
 
-  const handleSave = () => {
-    console.log('Saving settings:', settings)
-    // TODO: Save to backend
+  useEffect(() => {
+    fetchSettings()
+  }, [])
+
+  async function fetchSettings() {
+    try {
+      const mode = await getMaintenanceMode()
+      setSettings({
+        ...settings,
+        maintenanceMode: mode.enabled,
+        maintenanceMessage: mode.message || ""
+      })
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await setMaintenanceMode(settings.maintenanceMode, settings.maintenanceMessage)
+      alert("Settings saved successfully!")
+    } catch (error) {
+      alert("Failed to save settings.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const toggleMaintenance = () => {
+    const nextValue = !settings.maintenanceMode
+    const message = nextValue 
+      ? "ARE YOU ABSOLUTELY SURE? This will block all student access to the platform."
+      : "Disable maintenance mode and restore student access?"
+    
+    if (confirm(message)) {
+      setSettings({ ...settings, maintenanceMode: nextValue })
+    }
   }
 
   return (
@@ -158,34 +200,49 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border-2 border-red-200 dark:border-red-800">
-            <div>
-              <h3 className="font-semibold text-text-light dark:text-text-dark">Enable Maintenance Mode</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Platform will be inaccessible to students</p>
-            </div>
-            <button
-              onClick={() => setSettings({ ...settings, maintenanceMode: !settings.maintenanceMode })}
-              className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
-                settings.maintenanceMode ? 'bg-red-500' : 'bg-gray-300 dark:bg-gray-600'
-              }`}
-            >
-              <span
-                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-200 ${
-                  settings.maintenanceMode ? 'transform translate-x-6' : ''
+          <div className="flex flex-col gap-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border-2 border-red-200 dark:border-red-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-text-light dark:text-text-dark">Enable Maintenance Mode</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Platform will be inaccessible to students</p>
+              </div>
+              <button
+                onClick={toggleMaintenance}
+                className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
+                  settings.maintenanceMode ? 'bg-red-500' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
+              >
+                <span
+                  className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-200 ${
+                    settings.maintenanceMode ? 'transform translate-x-6' : ''
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-red-900 dark:text-red-200 mb-2 uppercase tracking-widest">
+                Maintenance Message
+              </label>
+              <textarea
+                value={settings.maintenanceMessage}
+                onChange={(e) => setSettings({ ...settings, maintenanceMessage: e.target.value })}
+                rows={2}
+                placeholder="Enter message for students..."
+                className="w-full p-4 rounded-xl border border-red-200 dark:border-red-800 bg-white/50 dark:bg-black/20 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/20"
               />
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Save Button */}
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            className="px-8 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg font-medium hover:opacity-90 transition-opacity duration-200 flex items-center space-x-2"
+            disabled={saving}
+            className={`px-10 py-4 bg-premium-gradient text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-3xl hover:scale-105 active:scale-95 transition-all flex items-center space-x-3 ${saving ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <Save className="w-5 h-5" />
-            <span>Save Changes</span>
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            <span>{saving ? 'Synchronizing...' : 'Save Changes'}</span>
           </button>
         </div>
       </div>

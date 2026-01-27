@@ -169,3 +169,23 @@ export async function getStudentSubmission(assignmentId: string, studentId: stri
 
     return data;
 }
+/**
+ * Get all submissions for a specific student (with assignment details)
+ */
+export async function getStudentSubmissions(studentId: string): Promise<AssignmentSubmission[]> {
+    const { data, error } = await supabase
+        .from("assignment_submissions")
+        .select(`
+            *,
+            assignments:assignment_id(title, course_code, level, max_score)
+        `)
+        .eq("student_id", studentId)
+        .order("submitted_at", { ascending: false });
+
+    if (error) {
+        console.error("Error fetching student submissions:", error);
+        return [];
+    }
+
+    return data || [];
+}

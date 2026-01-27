@@ -20,6 +20,14 @@ export default function AdminAssignmentsPage() {
   const [expandedAssignment, setExpandedAssignment] = useState<string | null>(null)
   const [submissions, setSubmissions] = useState<{ [key: string]: any[] }>({})
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEvalModal, setShowEvalModal] = useState(false)
+  const [evalData, setEvalData] = useState({
+    submissionId: '',
+    assignmentId: '',
+    score: 0,
+    feedback: '',
+    studentName: ''
+  })
   
   // Form State
   const [newAssignment, setNewAssignment] = useState({
@@ -82,6 +90,22 @@ export default function AdminAssignmentsPage() {
       fetchAssignments()
     } catch (error) {
       alert('Failed to create assignment')
+    }
+  }
+
+  async function handleEvaluate(e: React.FormEvent) {
+    e.preventDefault()
+    try {
+      await gradeSubmission(evalData.submissionId, {
+        score: evalData.score,
+        feedback: evalData.feedback
+      })
+      setShowEvalModal(false)
+      // Refresh submissions for this assignment
+      const data = await getAssignmentSubmissions(evalData.assignmentId)
+      setSubmissions(prev => ({ ...prev, [evalData.assignmentId]: data }))
+    } catch (error) {
+      alert('Failed to evaluate submission')
     }
   }
 
@@ -223,7 +247,21 @@ export default function AdminAssignmentsPage() {
                               )}
                             </td>
                             <td className="px-6 py-6 text-right">
-                              <button className="px-4 py-2 bg-primary-light text-white text-[8px] font-black uppercase tracking-widest rounded-lg hover:bg-primary-dark transition-all">Evaluate</button>
+                              <button 
+                                onClick={() => {
+                                  setEvalData({
+                                    submissionId: sub.id,
+                                    assignmentId: assignment.id,
+                                    score: sub.score || 0,
+                                    feedback: sub.feedback || '',
+                                    studentName: sub.profiles?.full_name || 'Student'
+                                  })
+                                  setShowEvalModal(true)
+                                }}
+                                className="px-4 py-2 bg-primary-light text-white text-[8px] font-black uppercase tracking-widest rounded-lg hover:bg-primary-dark transition-all"
+                              >
+                                {sub.score !== null ? 'Re-evaluate' : 'Evaluate'}
+                              </button>
                             </td>
                           </tr>
                         ))
@@ -333,6 +371,55 @@ export default function AdminAssignmentsPage() {
                 className="w-full py-5 bg-premium-gradient text-white rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:scale-[1.01] active:scale-95 transition-all mt-4"
               >
                 Deploy Task
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Evaluation Modal */}
+      {showEvalModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-subtle-dark w-full max-w-lg rounded-[2.5rem] p-10 shadow-3xl animate-scale-in">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-black uppercase tracking-tighter">Evaluate Submission</h2>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{evalData.studentName}</p>
+              </div>
+              <button onClick={() => setShowEvalModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all">
+                <XCircle className="w-6 h-6 text-gray-400" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEvaluate} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Score (Max {assignments.find(a => a.id === evalData.assignmentId)?.max_score || 100})</label>
+                <input 
+                  required
+                  type="number"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border-0 rounded-xl px-5 py-4 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all"
+                  value={evalData.score}
+                  onChange={e => setEvalData({...evalData, score: parseInt(e.target.value)})}
+                  max={assignments.find(a => a.id === evalData.assignmentId)?.max_score || 100}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Lecturer Remark / Feedback</label>
+                <textarea 
+                  required
+                  className="w-full bg-gray-50 dark:bg-gray-800 border-0 rounded-2xl px-5 py-4 font-medium text-sm focus:ring-2 focus:ring-primary-light transition-all min-h-[120px]"
+                  placeholder="Provide feedback on the submission..."
+                  value={evalData.feedback}
+                  onChange={e => setEvalData({...evalData, feedback: e.target.value})}
+                />
+              </div>
+
+              <button 
+                type="submit"
+                className="w-full py-5 bg-premium-gradient text-white rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:scale-[1.01] active:scale-95 transition-all mt-4"
+              >
+                Log Evaluation
               </button>
             </form>
           </div>

@@ -24,6 +24,7 @@ import { useAuth } from '@/lib/auth-context'
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/student' },
   { icon: BookOpen, label: 'My Assignments', href: '/student/assignments' },
+  { icon: FileText, label: 'Result Scores', href: '/student/scores' },
   { icon: Lightbulb, label: 'Study Hub', href: '/student/study-hub' },
   { icon: Library, label: 'eBooks', href: '/student/ebooks' },
   { icon: FileText, label: 'Blog', href: '/student/blog' },

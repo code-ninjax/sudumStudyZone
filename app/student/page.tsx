@@ -8,19 +8,27 @@ import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/packages/supabase/src/client'
+import { getAllBlogPosts } from '@/packages/supabase/src/admin'
+import { getAllCourses } from '@/packages/supabase/src/helpers'
 
 export default function StudentDashboardPage() {
   const router = useRouter()
   const { profile, user, loading, signOut } = useAuth()
   const [courses, setCourses] = useState<any[]>([])
   const [assignments, setAssignments] = useState<any[]>([])
+  const [submissions, setSubmissions] = useState<any[]>([])
+  const [recentPosts, setRecentPosts] = useState<any[]>([])
   const [coursesLoading, setCoursesLoading] = useState(true)
 
   useEffect(() => {
     if (!loading) {
       if (user?.id) {
-        // Run both in parallel instead of sequentially
-        Promise.all([fetchEnrolledCourses(), fetchAssignments()])
+        // Run everything in parallel
+        Promise.all([
+          fetchEnrolledCourses(), 
+          fetchAssignments(),
+          fetchRecentBlogPosts()
+        ])
       } else {
         // No user ID - set loading to false to show content
         setCoursesLoading(false)
@@ -80,34 +88,51 @@ export default function StudentDashboardPage() {
 
   const fetchAssignments = async () => {
     try {
-      // For now, we'll show an empty state since assignments table may not be set up yet
-      // This can be updated once the assignments table is created
-      const { data: assignments, error } = await supabase
+      // 1. Fetch ALL assignments for student's level
+      const { data: allAssignments, error: assignmentsError } = await supabase
         .from('assignments')
         .select('*')
-        .eq('student_id', user?.id)
-        .order('due_date', { ascending: true })
-        .limit(5)
+        .eq('level', profile?.level || '100L')
+        .order('due_date', { ascending: true });
 
-      if (error) {
-        console.log('Assignments table not available yet:', error.message)
-        setAssignments([])
-        return
-      }
+      if (assignmentsError) throw assignmentsError;
 
-      setAssignments(assignments || [])
+      // 2. Fetch student's submissions
+      const { data: studentSubmissions, error: submissionsError } = await supabase
+        .from('assignment_submissions')
+        .select('assignment_id')
+        .eq('student_id', user?.id);
+
+      if (submissionsError) throw submissionsError;
+
+      setAssignments(allAssignments || []);
+      setSubmissions(studentSubmissions || []);
     } catch (err: any) {
-      console.log('Assignments not available:', err.message)
-      setAssignments([])
+      console.error('Error loading assignments data:', err);
+      setAssignments([]);
+      setSubmissions([]);
     }
   }
 
-  // Points and streaks start at 0 for now (will be implemented later)
+  const fetchRecentBlogPosts = async () => {
+    try {
+      const posts = await getAllBlogPosts(false)
+      setRecentPosts(posts || [])
+    } catch (err) {
+      console.error('Error loading blog posts:', err)
+    }
+  }
+
+  // Calculate real stats
+  const submittedIds = new Set(submissions.map((s: any) => s.assignment_id));
+  const pendingAssignments = assignments.filter(a => !submittedIds.has(a.id));
+  const totalPoints = submissions.reduce((sum: number, s: any) => sum + (s.score || 0), 0);
+
   const stats = [
-    { icon: Award, label: 'Total Points', value: 0, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10' },
+    { icon: Award, label: 'Total Points', value: totalPoints, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10' },
     { icon: Flame, label: 'Day Streak', value: 0, suffix: ' days', color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
-    { icon: BookOpen, label: 'Enrolled Courses', value: courses.length, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-    { icon: FileText, label: 'Assignments', value: assignments.length, suffix: ' pending', color: 'text-red-500', bgColor: 'bg-red-500/10' },
+    { icon: FileText, label: 'Submitted Tasks', value: submissions.length, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+    { icon: FileText, label: 'Assignments', value: pendingAssignments.length, suffix: ' pending', color: 'text-red-500', bgColor: 'bg-red-500/10' },
   ]
 
   const achievements = [
@@ -250,6 +275,54 @@ export default function StudentDashboardPage() {
                 ))}
               </div>
             )}
+          </section>
+
+          {/* Recent Intelligence (Blog) Section */}
+          <section className="bg-white dark:bg-subtle-dark rounded-[2.5rem] p-10 border border-gray-100 dark:border-gray-800 shadow-sm">
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="text-2xl font-black text-text-light dark:text-text-dark tracking-tight uppercase">Recent Intelligence</h2>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Global Research & Updates</p>
+              </div>
+              <Link href="/blog" className="text-[10px] font-black text-primary-light uppercase tracking-[0.25em] border-b-2 border-primary-light pb-1 hover:text-accent-light hover:border-accent-light transition-colors">
+                Internal Chronicles
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {recentPosts.length > 0 ? (
+                recentPosts.slice(0, 2).map((post) => (
+                  <Link 
+                    key={post.id} 
+                    href={`/blog/${post.slug}`}
+                    className="group bg-gray-50 dark:bg-gray-800/30 rounded-3xl overflow-hidden border border-transparent hover:border-primary-light/20 transition-all flex flex-col"
+                  >
+                    <div className="h-32 relative overflow-hidden">
+                      {post.featured_image_url ? (
+                        <img src={post.featured_image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      ) : (
+                        <div className="w-full h-full bg-premium-gradient opacity-10 flex items-center justify-center">
+                           <FileText className="w-8 h-8 text-primary-light" />
+                        </div>
+                      )}
+                      <div className="absolute top-3 left-3 px-2 py-0.5 bg-white/90 dark:bg-black/80 rounded-full text-[8px] font-black uppercase tracking-widest text-primary-light">
+                        {post.category}
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <h3 className="font-black text-text-light dark:text-text-dark text-sm mb-2 line-clamp-1 group-hover:text-primary-light transition-colors uppercase tracking-tight">{post.title}</h3>
+                      <p className="text-[10px] text-gray-500 line-clamp-2 leading-relaxed font-medium">
+                        {post.excerpt || post.content.substring(0, 100) + '...'}
+                      </p>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="col-span-full py-12 text-center bg-gray-50/30 dark:bg-gray-800/10 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
+                  <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">No recent intelligence logged</p>
+                </div>
+              )}
+            </div>
           </section>
         </div>
 

@@ -4,24 +4,31 @@ import { useState, useEffect } from 'react'
 import { Calendar, Clock, User, ArrowRight, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { BlogSkeleton } from '@/components/SkeletonLoader'
-import { getAllBlogPosts } from '@/packages/supabase/src/admin'
+import { getAllBlogPosts, getBlogCategories } from '@/packages/supabase/src/admin'
+import { Tag } from 'lucide-react'
 
 export default function StudentBlogPage() {
   const [loading, setLoading] = useState(true)
   const [posts, setPosts] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
 
   useEffect(() => {
-    async function fetchPosts() {
+    async function fetchData() {
       try {
-        const data = await getAllBlogPosts(false) // Only published posts
-        setPosts(data || [])
+        const [postsData, catsData] = await Promise.all([
+          getAllBlogPosts(false),
+          getBlogCategories()
+        ])
+        setPosts(postsData || [])
+        setCategories(catsData || [])
       } catch (error) {
-        console.error('Error fetching blog posts:', error)
+        console.error('Error fetching blog data:', error)
       } finally {
         setLoading(false)
       }
     }
-    fetchPosts()
+    fetchData()
   }, [])
 
   // Format date
@@ -39,6 +46,10 @@ export default function StudentBlogPage() {
     const minutes = Math.ceil(wordCount / 200)
     return `${minutes} min read`
   }
+
+  const filteredPosts = selectedCategory === 'All' 
+    ? posts 
+    : posts.filter(post => post.category === selectedCategory || post.category_id === selectedCategory)
 
   if (loading) {
     return <BlogSkeleton />
@@ -65,15 +76,42 @@ export default function StudentBlogPage() {
         </div>
       </div>
 
+      {/* Category Filter */}
+      <div className="flex flex-wrap items-center gap-3 mb-10 overflow-x-auto no-scrollbar pb-2">
+        <button
+          onClick={() => setSelectedCategory('All')}
+          className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+            selectedCategory === 'All'
+              ? 'bg-primary-light text-white shadow-lg'
+              : 'bg-white dark:bg-subtle-dark text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-100 dark:border-gray-800'
+          }`}
+        >
+          All Articles
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setSelectedCategory(cat.id)}
+            className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              selectedCategory === cat.id
+                ? 'bg-primary-light text-white shadow-lg'
+                : 'bg-white dark:bg-subtle-dark text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-100 dark:border-gray-800'
+            }`}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
+
       {/* Blog Grid */}
-      {posts.length === 0 ? (
+      {filteredPosts.length === 0 ? (
         <div className="py-24 text-center glass-card rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
            <FileText className="w-16 h-16 text-gray-200 mx-auto mb-6" />
            <p className="text-gray-400 font-black uppercase tracking-[0.25em] text-sm">No articles published yet so yrr</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {posts.map((post) => (
+          {filteredPosts.map((post) => (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
