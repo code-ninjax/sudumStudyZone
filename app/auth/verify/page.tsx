@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle2, XCircle, Mail, ArrowRight } from 'lucide-react'
@@ -9,6 +10,7 @@ import { supabase } from '@/packages/supabase/src/client'
 
 export default function VerifyEmailPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [verifying, setVerifying] = useState(true)
     const [verified, setVerified] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -18,6 +20,25 @@ export default function VerifyEmailPage() {
         // We just need to check the session
         const checkVerification = async () => {
             try {
+                const code = searchParams.get('code')
+                const errorDescription = searchParams.get('error_description')
+
+                if (errorDescription) {
+                    setError(errorDescription)
+                    setVerifying(false)
+                    return
+                }
+
+                if (code) {
+                    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+
+                    if (exchangeError) {
+                        setError(exchangeError.message)
+                        setVerifying(false)
+                        return
+                    }
+                }
+
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
                 if (sessionError) {
@@ -44,7 +65,7 @@ export default function VerifyEmailPage() {
         }
 
         checkVerification()
-    }, [router])
+    }, [router, searchParams])
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-white via-green-50 to-white dark:from-background-dark dark:via-emerald-950/20 dark:to-background-dark flex items-center justify-center py-12 px-4">

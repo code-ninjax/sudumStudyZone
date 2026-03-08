@@ -1,20 +1,41 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import type { ChangeEvent, FormEvent, InputHTMLAttributes } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Mail, Lock, User, ArrowRight, CheckCircle2, MailOpen } from 'lucide-react'
-import Input from '@/components/Input'
+import { useRouter } from 'next/navigation'
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Building2,
+  CheckCircle2,
+  GraduationCap,
+  Hash,
+  Layers3,
+  Lock,
+  Mail,
+  MailOpen,
+  ShieldCheck,
+  User,
+} from 'lucide-react'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import { useAuth } from '@/lib/auth-context'
 
 export const dynamic = 'force-dynamic'
 
+const levels = ['100L', '200L', '300L', '400L', '500L']
+
 export default function SignupPage() {
+  const [step, setStep] = useState<1 | 2>(1)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    faculty: '',
+    department: '',
+    level: '100L',
+    matricNumber: '',
     password: '',
     confirmPassword: '',
   })
@@ -25,43 +46,76 @@ export default function SignupPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect if already logged in
     if (user) {
       router.push('/student')
     }
-  }, [user, router])
+  }, [router, user])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData((current) => ({
+      ...current,
       [e.target.name]: e.target.value,
-    })
+    }))
     setError(null)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
+  const validateAccountStep = () => {
+    if (!formData.fullName.trim() || !formData.email.trim()) {
+      setError('Full name and email are required.')
+      return false
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError('Password must be at least 6 characters.')
+      return false
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.')
+      return false
+    }
+
+    return true
+  }
+
+  const validateAcademicStep = () => {
+    if (!formData.faculty.trim() || !formData.department.trim() || !formData.level || !formData.matricNumber.trim()) {
+      setError('Faculty, department, level, and matric number are required.')
+      return false
+    }
+
+    return true
+  }
+
+  const goToAcademicStep = () => {
+    setError(null)
+    if (!validateAccountStep()) {
+      return
+    }
+    setStep(2)
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setError(null)
+
+    if (!validateAccountStep() || !validateAcademicStep()) {
       return
     }
 
     setLoading(true)
 
     try {
-      const { error } = await signUp(
-        formData.email,
-        formData.password,
-        formData.fullName
-      )
+      const { error } = await signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        fullName: formData.fullName.trim(),
+        faculty: formData.faculty.trim(),
+        department: formData.department.trim(),
+        level: formData.level,
+        matricNumber: formData.matricNumber.trim(),
+        redirectTo: `${window.location.origin}/auth/verify`,
+      })
 
       if (error) {
         setError(error.message || 'Failed to create account. Please try again.')
@@ -69,88 +123,73 @@ export default function SignupPage() {
       }
 
       setSuccess(true)
-      // Don't redirect - show email verification screen instead
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred')
+      setError(err.message || 'An unexpected error occurred.')
     } finally {
       setLoading(false)
     }
   }
 
-  // Show email verification screen if signup was successful
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-white via-green-50 to-white dark:from-background-dark dark:via-emerald-950/20 dark:to-background-dark flex items-center justify-center py-12 px-4">
-        <div className="max-w-2xl w-full">
-          <Card className="text-center animate-fade-in">
-            <div className="py-12 px-6">
-              {/* Animated Checkmark */}
-              <div className="flex justify-center mb-6">
-                <div className="relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 rounded-full flex items-center justify-center animate-scale-in shadow-lg">
-                    <CheckCircle2 className="w-14 h-14 text-white" strokeWidth={2.5} />
-                  </div>
-                  <div className="absolute inset-0 w-24 h-24 bg-green-500/30 dark:bg-green-600/30 rounded-full animate-ping" />
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.18),_transparent_32%),linear-gradient(160deg,#f8fff8_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.2),_transparent_32%),linear-gradient(160deg,#03130b_0%,#08140d_45%,#020617_100%)] px-4 py-12">
+        <div className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-5xl items-center">
+          <Card className="w-full rounded-[2.5rem] border border-white/60 bg-white/85 p-8 shadow-[0_32px_90px_rgba(22,163,74,0.12)] backdrop-blur xl:p-12">
+            <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
+              <div>
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-700">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Account Created
                 </div>
-              </div>
-
-              {/* Success Message */}
-              <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark mb-3">
-                Check Your Email!
-              </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-                We've sent a verification link to{' '}
-                <span className="font-semibold text-primary-light dark:text-primary-dark break-all">
-                  {formData.email}
-                </span>
-              </p>
-
-              {/* Email Icon Card */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-xl p-8 mb-8 max-w-lg mx-auto">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
-                    <MailOpen className="w-8 h-8 text-primary-light dark:text-primary-dark" />
-                  </div>
-                </div>
-                <h3 className="font-bold text-lg text-text-light dark:text-text-dark mb-3">
-                  Next Steps
-                </h3>
-                <ol className="text-left text-sm text-gray-700 dark:text-gray-300 space-y-2">
-                  <li className="flex items-start">
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-light dark:bg-primary-dark text-white text-xs font-bold mr-3 flex-shrink-0 mt-0.5">
-                      1
-                    </span>
-                    <span>Open your email inbox and find our verification email</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-light dark:bg-primary-dark text-white text-xs font-bold mr-3 flex-shrink-0 mt-0.5">
-                      2
-                    </span>
-                    <span>Click the verification link in the email</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-light dark:bg-primary-dark text-white text-xs font-bold mr-3 flex-shrink-0 mt-0.5">
-                      3
-                    </span>
-                    <span>Return here and sign in to access your dashboard</span>
-                  </li>
-                </ol>
-              </div>
-
-              {/* Additional Info */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Didn't receive the email? Check your spam folder or{' '}
-                  <button className="text-primary-light dark:text-primary-dark font-semibold hover:underline">
-                    resend verification email
-                  </button>
+                <h1 className="max-w-xl text-4xl font-black uppercase tracking-tight text-text-light dark:text-text-dark md:text-5xl">
+                  Verify your email to finish the signup flow.
+                </h1>
+                <p className="mt-5 max-w-xl text-base font-medium leading-7 text-gray-600 dark:text-gray-300">
+                  We sent a verification link to <span className="font-black text-primary-light">{formData.email}</span>.
+                  Your academic criteria were included in the signup request.
                 </p>
+
+                <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5">
+                    <MailOpen className="mb-3 h-5 w-5 text-primary-light" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 1</p>
+                    <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Open your inbox.</p>
+                  </div>
+                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5">
+                    <ShieldCheck className="mb-3 h-5 w-5 text-primary-light" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 2</p>
+                    <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Verify the account.</p>
+                  </div>
+                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5">
+                    <ArrowRight className="mb-3 h-5 w-5 text-primary-light" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 3</p>
+                    <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Sign in and continue.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[2.25rem] bg-black p-8 text-white shadow-2xl">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-white/10">
+                  <MailOpen className="h-8 w-8" />
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tight">Academic Criteria Sent</h2>
+                <div className="mt-8 rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/45">Student Summary</p>
+                  <p className="mt-3 text-sm font-bold">{formData.fullName}</p>
+                  <p className="mt-2 text-sm text-white/70">{formData.faculty}</p>
+                  <p className="mt-1 text-sm text-white/70">{formData.department}</p>
+                  <p className="mt-1 text-sm text-white/70">{formData.matricNumber}</p>
+                  <p className="mt-4 inline-flex rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-green-300">
+                    {formData.level}
+                  </p>
+                </div>
+
                 <Link
                   href="/auth/login"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary-light dark:bg-primary-dark text-white rounded-lg font-medium hover:opacity-90 transition-opacity duration-200"
+                  className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-black transition-transform hover:scale-[1.02]"
                 >
-                  Go to Login
-                  <ArrowRight className="w-4 h-4" />
+                  Go To Login
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -160,146 +199,275 @@ export default function SignupPage() {
     )
   }
 
-  // Show signup form by default
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-green-50 to-white dark:from-background-dark dark:via-emerald-950/20 dark:to-background-dark py-12 px-4">
-      <div className="container-custom">
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark mb-2">
-              Create Account
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.2),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.14),_transparent_28%),linear-gradient(160deg,#f6fff7_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.22),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.16),_transparent_28%),linear-gradient(160deg,#04110a_0%,#09160e_45%,#020617_100%)] px-4 py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl gap-8 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
+        <section className="relative overflow-hidden rounded-[2.75rem] bg-[#0d1f17] p-8 text-white shadow-[0_28px_80px_rgba(2,6,23,0.28)] lg:p-12">
+          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-green-400/20 blur-3xl" />
+          <div className="absolute -bottom-20 left-10 h-48 w-48 rounded-full bg-orange-400/10 blur-3xl" />
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-300">
+              <BookOpen className="h-4 w-4" />
+              Dedicated Signup Flow
+            </div>
+            <h1 className="mt-6 max-w-md text-4xl font-black uppercase leading-none tracking-tight md:text-5xl">
+              Create the account, then capture the academic criteria before submission.
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Join our academic community today
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/75">
+              This signup flow now gives faculty, department, and level their own dedicated step so the client requirement is visible and explicit.
             </p>
+
+            <div className="mt-10 space-y-4">
+              <StepPreview
+                index="01"
+                title="Account Identity"
+                text="Collect full name, email, and password first."
+              />
+              <StepPreview
+                index="02"
+                title="Academic Criteria"
+                text="Collect faculty, department, and level before account creation."
+              />
+              <StepPreview
+                index="03"
+                title="Supabase Signup"
+                text="Send all fields together in the signup request metadata."
+              />
+            </div>
+          </div>
+        </section>
+
+        <Card className="rounded-[2.75rem] border border-white/70 bg-white/88 p-7 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur lg:p-10">
+          <div className="mb-8 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-primary-light">Student Signup</p>
+              <h2 className="mt-3 text-3xl font-black uppercase tracking-tight text-text-light dark:text-text-dark">
+                {step === 1 ? 'Account Details' : 'Academic Criteria'}
+              </h2>
+              <p className="mt-3 max-w-lg text-sm leading-7 text-gray-600 dark:text-gray-300">
+                {step === 1
+                  ? 'Step 1 of 2. Create the base account details first.'
+                  : 'Step 2 of 2. These fields are sent to Supabase during signup.'}
+              </p>
+            </div>
+            <div className="hidden rounded-[1.5rem] bg-primary-light/10 px-4 py-3 text-[11px] font-black uppercase tracking-[0.22em] text-primary-light sm:block">
+              Step {step} / 2
+            </div>
           </div>
 
-          <Card className="animate-slide-up">
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-6">
-                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
-              </div>
-            )}
+          <div className="mb-8 grid grid-cols-2 gap-3">
+            <div className={`rounded-2xl px-4 py-3 text-center text-[11px] font-black uppercase tracking-[0.2em] ${step === 1 ? 'bg-primary-light text-white' : 'bg-gray-100 text-gray-400'}`}>
+              Account
+            </div>
+            <div className={`rounded-2xl px-4 py-3 text-center text-[11px] font-black uppercase tracking-[0.2em] ${step === 2 ? 'bg-primary-light text-white' : 'bg-gray-100 text-gray-400'}`}>
+              Academic
+            </div>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
+          {error && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {step === 1 ? (
+              <>
+                <div className="grid gap-5 md:grid-cols-2">
+                  <AuthField
+                    icon={User}
+                    label="Full Name"
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
-                    className="input-field pl-10"
-                    placeholder="John Doe"
-                    required
+                    placeholder="Tokunbo Adeyemi"
                     disabled={loading}
                   />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="email"
+                  <AuthField
+                    icon={Mail}
+                    label="Email Address"
                     name="email"
+                    type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="input-field pl-10"
-                    placeholder="your.email@example.com"
-                    required
+                    placeholder="student@example.com"
                     disabled={loading}
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="password"
+                <div className="grid gap-5 md:grid-cols-2">
+                  <AuthField
+                    icon={Lock}
+                    label="Password"
                     name="password"
+                    type="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="input-field pl-10"
-                    placeholder="Create a strong password (min. 6 characters)"
-                    required
+                    placeholder="Minimum 6 characters"
                     disabled={loading}
                   />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="password"
+                  <AuthField
+                    icon={Lock}
+                    label="Confirm Password"
                     name="confirmPassword"
+                    type="password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="input-field pl-10"
-                    placeholder="Confirm your password"
-                    required
+                    placeholder="Repeat password"
                     disabled={loading}
                   />
                 </div>
-              </div>
 
-              <div className="flex items-start">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 mt-1 text-primary-light dark:text-primary-dark border-gray-300 rounded focus:ring-primary-light dark:focus:ring-primary-dark"
-                  required
-                />
-                <label className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                  I agree to the{' '}
-                  <Link href="/terms" className="text-primary-light dark:text-primary-dark hover:underline">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link href="/privacy" className="text-primary-light dark:text-primary-dark hover:underline">
-                    Privacy Policy
-                  </Link>
-                </label>
-              </div>
+                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600">
+                  Your academic data will be collected in the next step before the account is submitted.
+                </div>
 
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full"
-                loading={loading}
-              >
-                Create Account
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 dark:text-gray-400">
-                Already have an account?{' '}
-                <Link
-                  href="/auth/login"
-                  className="text-primary-light dark:text-primary-dark font-semibold hover:underline"
+                <Button
+                  type="button"
+                  variant="primary"
+                  className="w-full rounded-2xl py-4 text-[11px] font-black uppercase tracking-[0.24em]"
+                  onClick={goToAcademicStep}
                 >
-                  Sign In
-                </Link>
-              </p>
-            </div>
-          </Card>
-        </div>
+                  Continue To Academic Criteria
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="grid gap-5 md:grid-cols-2">
+                  <AuthField
+                    icon={Building2}
+                    label="Faculty"
+                    name="faculty"
+                    value={formData.faculty}
+                    onChange={handleChange}
+                    placeholder="Faculty of Science"
+                    disabled={loading}
+                  />
+                  <AuthField
+                    icon={GraduationCap}
+                    label="Department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    placeholder="Computer Science"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-2">
+                  <AuthField
+                    icon={Hash}
+                    label="Matric Number"
+                    name="matricNumber"
+                    value={formData.matricNumber}
+                    onChange={handleChange}
+                    placeholder="DE.2024/1234"
+                    disabled={loading}
+                  />
+
+                  <div>
+                    <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-gray-500">
+                      Level
+                    </label>
+                    <div className="relative">
+                      <Layers3 className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <select
+                        name="level"
+                        value={formData.level}
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {levels.map((level) => (
+                          <option key={level} value={level}>
+                            {level}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600">
+                 
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full rounded-2xl py-4 text-[11px] font-black uppercase tracking-[0.24em]"
+                    onClick={() => {
+                      setError(null)
+                      setStep(1)
+                    }}
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-full rounded-2xl py-4 text-[11px] font-black uppercase tracking-[0.24em]"
+                    loading={loading}
+                  >
+                    Submit Signup
+                  </Button>
+                </div>
+              </>
+            )}
+          </form>
+
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
+            Already have an account?{' '}
+            <Link href="/auth/login" className="font-black text-primary-light hover:underline">
+              Sign In
+            </Link>
+          </p>
+        </Card>
       </div>
+    </div>
+  )
+}
+
+function AuthField({
+  icon: Icon,
+  label,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement> & {
+  icon: typeof User
+  label: string
+}) {
+  return (
+    <div>
+      <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-gray-500">
+        {label}
+      </label>
+      <div className="relative">
+        <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+        <input
+          {...props}
+          className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60"
+        />
+      </div>
+    </div>
+  )
+}
+
+function StepPreview({
+  index,
+  title,
+  text,
+}: {
+  index: string
+  title: string
+  text: string
+}) {
+  return (
+    <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
+      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/45">{index}</p>
+      <h3 className="mt-3 text-lg font-black uppercase tracking-tight">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-white/75">{text}</p>
     </div>
   )
 }

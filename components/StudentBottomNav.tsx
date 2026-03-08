@@ -14,7 +14,9 @@ import {
   Library,
   Bot,
   User,
-  LogOut
+  LogOut,
+  ClipboardList,
+  CheckSquare
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
@@ -28,6 +30,8 @@ const primaryLinks = [
 
 const otherLinks = [
   { icon: Lightbulb, label: 'Study Hub', href: '/student/study-hub' },
+  { icon: ClipboardList, label: 'Past Questions', href: '/student/past-questions' },
+  { icon: CheckSquare, label: 'Marking Scheme', href: '/student/marking-schemes' },
   { icon: Library, label: 'eBooks', href: '/student/ebooks' },
   { icon: Bot, label: 'AI Assistant', href: '/student/ai-chat' },
   { icon: User, label: 'Profile', href: '/student/profile' },

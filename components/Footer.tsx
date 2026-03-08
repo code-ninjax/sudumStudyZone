@@ -20,6 +20,7 @@ export default function Footer() {
     ],
     resources: [
       { href: '/study-hub', label: 'Study Hub' },
+      { href: '/search', label: 'Search' },
       { href: '/faq', label: 'FAQ' },
       { href: '/contact', label: 'Contact' },
     ],

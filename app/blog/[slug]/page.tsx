@@ -6,6 +6,7 @@ import { Calendar, User, Clock, ArrowLeft, Share2, Download, FileText } from 'lu
 import Link from 'next/link'
 import { getBlogPostBySlug, getAllBlogPosts } from '@/packages/supabase/src/admin'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
+import PrintButton from '@/components/PrintButton'
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const [loading, setLoading] = useState(true)
@@ -98,7 +99,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       <div className="container-custom">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
-          <Link href="/blog" className="inline-flex items-center text-primary-light dark:text-primary-dark hover:underline mb-8 animate-fade-in">
+          <Link href="/blog" className="no-print inline-flex items-center text-primary-light dark:text-primary-dark hover:underline mb-8 animate-fade-in">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Blog
           </Link>
@@ -140,11 +141,12 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             </div>
 
             {/* Share Button and Attachment */}
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="no-print flex flex-wrap items-center gap-4">
               <button className="flex items-center gap-2 px-4 py-2 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-lg hover:bg-primary-light/20 dark:hover:bg-primary-dark/20 transition-colors duration-200">
                 <Share2 className="w-4 h-4" />
                 <span>Share Article</span>
               </button>
+              <PrintButton />
               {post.attachment_url && (
                 <a
                   href={post.attachment_url}
@@ -171,7 +173,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           {relatedPosts.length > 0 && (
             <div className="animate-fade-in">
               <h2 className="text-2xl font-bold text-text-light dark:text-text-dark mb-6">Related Articles</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {relatedPosts.map((related) => (
                   <Link key={related.id} href={`/blog/${related.slug}`}>
                     <Card className="h-full cursor-pointer group hover:shadow-xl transition-shadow duration-200">
