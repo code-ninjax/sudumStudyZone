@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/packages/supabase/src/client'
 import type { Profile } from '@/packages/supabase/src/types'
-import { User, Mail, Hash, Building2, GraduationCap, Save, AlertCircle, CheckCircle, LogOut, Camera, ShieldCheck, Calendar, Activity } from 'lucide-react'
+import { User, Hash, Building2, GraduationCap, Save, AlertCircle, CheckCircle, LogOut, Camera, ShieldCheck, Calendar, Activity } from 'lucide-react'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
 
 export default function StudentProfilePage() {
@@ -17,6 +17,7 @@ export default function StudentProfilePage() {
     matricNumber: '',
     faculty: '',
     department: '',
+    level: '',
   })
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -49,6 +50,7 @@ export default function StudentProfilePage() {
             matricNumber: data.matric_number || '',
             faculty: data.faculty || '',
             department: data.department || '',
+            level: data.level || '',
           })
         }
       } catch (err) {
@@ -81,6 +83,7 @@ export default function StudentProfilePage() {
           matric_number: formData.matricNumber,
           faculty: formData.faculty,
           department: formData.department,
+          level: formData.level,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
@@ -131,7 +134,7 @@ export default function StudentProfilePage() {
               {formData.fullName || 'User Profile'}
             </h1>
             <p className="text-lg opacity-80 font-medium tracking-tight mb-8">
-              {formData.email} • <span className="text-yellow-300">Level {profile?.department ? '100L' : '--'}</span>
+              {formData.email} • <span className="text-yellow-300">Level {formData.level || '--'}</span>
             </p>
             
             <div className="flex flex-wrap justify-center md:justify-start gap-4">
@@ -217,6 +220,25 @@ export default function StudentProfilePage() {
                       onChange={e => setFormData({...formData, department: e.target.value})} 
                     />
                   </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Level</label>
+                <div className="relative group">
+                  <GraduationCap className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-light transition-colors" />
+                  <select
+                    className="w-full appearance-none bg-gray-50/50 dark:bg-gray-800/50 border-0 rounded-2xl pl-14 pr-6 py-5 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all"
+                    value={formData.level}
+                    onChange={e => setFormData({...formData, level: e.target.value})}
+                  >
+                    <option value="">Select level</option>
+                    <option value="100L">100L</option>
+                    <option value="200L">200L</option>
+                    <option value="300L">300L</option>
+                    <option value="400L">400L</option>
+                    <option value="500L">500L</option>
+                  </select>
                 </div>
               </div>
 

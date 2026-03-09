@@ -13,9 +13,16 @@ interface AuthContextType {
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signUp: (
-    email: string,
-    password: string,
-    fullName: string
+    input: {
+      email: string
+      password: string
+      fullName: string
+      faculty: string
+      department: string
+      level: string
+      matricNumber: string
+      redirectTo?: string
+    }
   ) => Promise<{ error: any }>
   signOut: () => Promise<void>
   isAdmin: boolean
@@ -117,17 +124,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ======================================================
   // SIGN UP
   // ======================================================
-  const signUp = async (
-    email: string,
-    password: string,
+  const signUp = async ({
+    email,
+    password,
+    fullName,
+    faculty,
+    department,
+    level,
+    matricNumber,
+    redirectTo,
+  }: {
+    email: string
+    password: string
     fullName: string
-  ) => {
+    faculty: string
+    department: string
+    level: string
+    matricNumber: string
+    redirectTo?: string
+  }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: redirectTo,
         data: {
           full_name: fullName,
+          faculty,
+          department,
+          level,
+          matric_number: matricNumber,
           role: 'student', // Default role for public signups
         },
       },

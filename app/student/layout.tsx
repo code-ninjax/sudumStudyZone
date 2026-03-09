@@ -11,10 +11,10 @@ export default function StudentLayout({
   return (
     <MaintenanceGuard>
       <ProtectedRoute>
-        <div className="flex h-screen bg-subtle-light dark:bg-background-dark overflow-hidden relative">
+        <div className="relative flex min-h-dvh bg-subtle-light dark:bg-background-dark lg:h-dvh overflow-hidden">
           <StudentSidebar />
-          <main className="flex-1 lg:ml-80 overflow-y-auto no-scrollbar transition-all duration-500">
-            <div className="p-4 lg:p-8 pb-32 lg:pb-8">
+          <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto no-scrollbar transition-all duration-500 lg:ml-80">
+            <div className="p-4 pb-32 sm:p-5 lg:p-8 lg:pb-8">
               {children}
             </div>
           </main>

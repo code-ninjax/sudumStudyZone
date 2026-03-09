@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar, Clock, User, ArrowRight, FileText } from 'lucide-react'
+import { Calendar, Clock, User, ArrowRight, FileText, Search } from 'lucide-react'
 import Link from 'next/link'
 import { BlogSkeleton } from '@/components/SkeletonLoader'
 import { getAllBlogPosts, getBlogCategories } from '@/packages/supabase/src/admin'
@@ -12,6 +12,7 @@ export default function StudentBlogPage() {
   const [posts, setPosts] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
     async function fetchData() {
@@ -48,8 +49,15 @@ export default function StudentBlogPage() {
   }
 
   const filteredPosts = selectedCategory === 'All' 
-    ? posts 
+    ? posts
     : posts.filter(post => post.category === selectedCategory || post.category_id === selectedCategory)
+
+  const searchedPosts = filteredPosts.filter((post) =>
+    !query.trim() ||
+    [post.title, post.excerpt, post.content, post.category]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(query.trim().toLowerCase()))
+  )
 
   if (loading) {
     return <BlogSkeleton />
@@ -58,7 +66,7 @@ export default function StudentBlogPage() {
   return (
     <div className="animate-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Premium Header */}
-      <div className="mb-14 bg-premium-gradient rounded-3xl p-10 sm:p-14 text-white shadow-2xl relative overflow-hidden group">
+      <div className="mb-10 bg-premium-gradient rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-[100px] -mr-40 -mt-40 transition-transform duration-1000 group-hover:scale-110"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-[80px] -ml-32 -mb-32"></div>
         
@@ -76,42 +84,53 @@ export default function StudentBlogPage() {
         </div>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex flex-wrap items-center gap-3 mb-10 overflow-x-auto no-scrollbar pb-2">
-        <button
-          onClick={() => setSelectedCategory('All')}
-          className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-            selectedCategory === 'All'
-              ? 'bg-primary-light text-white shadow-lg'
-              : 'bg-white dark:bg-subtle-dark text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-100 dark:border-gray-800'
-          }`}
-        >
-          All Articles
-        </button>
-        {categories.map((cat) => (
+      {/* Search + Category Filter */}
+      <div className="mb-10 grid gap-4 xl:grid-cols-[1fr,auto] xl:items-center">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search blog posts"
+            className="w-full rounded-[1.75rem] border border-gray-100 bg-white py-4 pl-14 pr-5 text-sm font-bold text-text-light outline-none focus:border-primary-light dark:border-gray-800 dark:bg-subtle-dark dark:text-text-dark"
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-3 overflow-x-auto no-scrollbar pb-2">
           <button
-            key={cat.id}
-            onClick={() => setSelectedCategory(cat.id)}
+            onClick={() => setSelectedCategory('All')}
             className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-              selectedCategory === cat.id
+              selectedCategory === 'All'
                 ? 'bg-primary-light text-white shadow-lg'
                 : 'bg-white dark:bg-subtle-dark text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-100 dark:border-gray-800'
             }`}
           >
-            {cat.name}
+            All Articles
           </button>
-        ))}
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                selectedCategory === cat.id
+                  ? 'bg-primary-light text-white shadow-lg'
+                  : 'bg-white dark:bg-subtle-dark text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-100 dark:border-gray-800'
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Blog Grid */}
-      {filteredPosts.length === 0 ? (
+      {searchedPosts.length === 0 ? (
         <div className="py-24 text-center glass-card rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-800">
            <FileText className="w-16 h-16 text-gray-200 mx-auto mb-6" />
-           <p className="text-gray-400 font-black uppercase tracking-[0.25em] text-sm">No articles published yet so yrr</p>
+           <p className="text-gray-400 font-black uppercase tracking-[0.25em] text-sm">No articles match this filter</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {filteredPosts.map((post) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {searchedPosts.map((post) => (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}

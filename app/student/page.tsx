@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Award, TrendingUp, BookOpen, FileText, Calendar, Target, Flame, Trophy, LogOut, Clock, ChevronRight } from 'lucide-react'
+import { Award, TrendingUp, BookOpen, FileText, Calendar, Target, Flame, Trophy, LogOut, Clock, ChevronRight, ClipboardList, CheckSquare } from 'lucide-react'
 import Link from 'next/link'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
@@ -141,6 +141,21 @@ export default function StudentDashboardPage() {
     { icon: Target, title: 'Goal Getter', description: 'Completed 5 assignments', unlocked: false },
   ]
 
+  const resourceLinks = [
+    {
+      href: '/student/past-questions',
+      icon: ClipboardList,
+      title: 'Past Questions',
+      description: 'Rehearse previous exam patterns with level-aware revision packs.',
+    },
+    {
+      href: '/student/marking-schemes',
+      icon: CheckSquare,
+      title: 'Marking Scheme',
+      description: 'Study score allocation, lecturer expectations, and answer structure.',
+    },
+  ]
+
   if (loading || coursesLoading) {
     return <DashboardSkeleton />
   }
@@ -224,6 +239,45 @@ export default function StudentDashboardPage() {
           </div>
         ))}
       </div>
+
+      <section className="mb-16 rounded-[2.5rem] border border-gray-100 bg-white p-8 shadow-sm dark:border-gray-800 dark:bg-subtle-dark">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-text-light dark:text-text-dark">
+              Exam Resources
+            </h2>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Quick access to revision materials curated for the student dashboard.
+            </p>
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary-light">
+            {profile?.level || 'All Levels'}
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          {resourceLinks.map((resource) => (
+            <Link
+              key={resource.href}
+              href={resource.href}
+              className="group rounded-[2rem] border border-gray-100 bg-gray-50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary-light/30 hover:shadow-lg dark:border-white/5 dark:bg-white/5"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-[1.5rem] bg-primary-light/10 text-primary-light dark:bg-primary-dark/10 dark:text-primary-dark">
+                  <resource.icon className="h-6 w-6" />
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-primary-light" />
+              </div>
+              <h3 className="mt-6 text-xl font-black uppercase tracking-tight text-text-light dark:text-text-dark">
+                {resource.title}
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-gray-600 dark:text-gray-300">
+                {resource.description}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Active Assignments Command Area */}
