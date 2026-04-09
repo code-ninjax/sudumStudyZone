@@ -23,9 +23,6 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement | null>(null)
   const { user, profile, signOut, isAdmin } = useAuth()
 
-  if (pathname && pathname.startsWith('/admin')) return null
-  if (pathname && pathname.startsWith('/student')) return null
-
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (!profileRef.current?.contains(event.target as Node)) {
@@ -36,6 +33,9 @@ export default function Navbar() {
     document.addEventListener('mousedown', handleOutsideClick)
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [])
+
+  if (pathname && pathname.startsWith('/admin')) return null
+  if (pathname && pathname.startsWith('/student')) return null
 
   const navLinks = [
     { href: '/', label: 'Home' },

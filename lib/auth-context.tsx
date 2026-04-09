@@ -170,22 +170,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // SIGN OUT
   // ======================================================
   const signOut = async () => {
+    // Capture status before signing out
     const isAdminUser = profile?.role === 'admin'
-    
-    setUser(null)
-    setProfile(null)
-    setSession(null)
-    setLoading(false)
-    
+
     try {
+      // Clear AI Chat History on logout
+      localStorage.removeItem('sudum_chat_history')
+      
+      // Signing out from Supabase will trigger the onAuthStateChange listener
       await supabase.auth.signOut()
+      
+      // Manually push the clean state just in case, though the listener handles it
+      setUser(null)
+      setProfile(null)
+      setSession(null)
+      setLoading(false)
+
+      if (isAdminUser) {
+        router.push('/admin/login')
+      } else {
+        router.push('/auth/login')
+      }
     } catch (error) {
-      console.error('Error signing out from Supabase:', error)
-    }
-    
-    if (isAdminUser) {
-      router.push('/admin/login')
-    } else {
+      console.error('Error signing out:', error)
+      // Fallback redirect
       router.push('/auth/login')
     }
   }

@@ -132,9 +132,9 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.18),_transparent_32%),linear-gradient(160deg,#f8fff8_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.2),_transparent_32%),linear-gradient(160deg,#03130b_0%,#08140d_45%,#020617_100%)] px-4 py-12">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.18),_transparent_32%),linear-gradient(160deg,#f8fff8_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.15),_transparent_32%),linear-gradient(160deg,#040d0a_0%,#050f0c_45%,#020617_100%)] px-4 py-12">
         <div className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-5xl items-center">
-          <Card className="w-full rounded-[2.5rem] border border-white/60 bg-white/85 p-8 shadow-[0_32px_90px_rgba(22,163,74,0.12)] backdrop-blur xl:p-12">
+          <Card className="w-full rounded-[3.5rem] border border-white/60 bg-white/85 p-8 shadow-[0_32px_90px_rgba(22,163,74,0.12)] backdrop-blur xl:p-12 dark:border-white/5 dark:bg-[#060f0c]/90">
             <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
               <div>
                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-700">
@@ -150,17 +150,17 @@ export default function SignupPage() {
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5">
+                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5 dark:border-white/5 dark:bg-white/[0.03]">
                     <MailOpen className="mb-3 h-5 w-5 text-primary-light" />
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 1</p>
                     <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Open your inbox.</p>
                   </div>
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5">
+                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5 dark:border-white/5 dark:bg-white/[0.03]">
                     <ShieldCheck className="mb-3 h-5 w-5 text-primary-light" />
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 2</p>
                     <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Verify the account.</p>
                   </div>
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5">
+                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5 dark:border-white/5 dark:bg-white/[0.03]">
                     <ArrowRight className="mb-3 h-5 w-5 text-primary-light" />
                     <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 3</p>
                     <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Sign in and continue.</p>
@@ -200,9 +200,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.2),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.14),_transparent_28%),linear-gradient(160deg,#f6fff7_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.22),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.16),_transparent_28%),linear-gradient(160deg,#04110a_0%,#09160e_45%,#020617_100%)] px-4 py-10">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.2),_transparent_30%),linear-gradient(160deg,#f6fff7_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.15),_transparent_32%),linear-gradient(160deg,#040d0a_0%,#050f0c_45%,#020617_100%)] px-4 py-10">
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl gap-8 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
-        <section className="relative overflow-hidden rounded-[2.75rem] bg-[#0d1f17] p-8 text-white shadow-[0_28px_80px_rgba(2,6,23,0.28)] lg:p-12">
+        <section className="relative overflow-hidden rounded-[3.5rem] bg-[#050f0c] p-8 text-white shadow-[0_28px_80px_rgba(2,6,23,0.35)] lg:p-12 border border-white/5">
           <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-green-400/20 blur-3xl" />
           <div className="absolute -bottom-20 left-10 h-48 w-48 rounded-full bg-orange-400/10 blur-3xl" />
           <div className="relative z-10">
@@ -237,7 +237,7 @@ export default function SignupPage() {
           </div>
         </section>
 
-        <Card className="rounded-[2.75rem] border border-white/70 bg-white/88 p-7 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur lg:p-10">
+        <Card className="rounded-[3.5rem] border border-white/70 bg-white/88 p-7 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur lg:p-12 dark:border-white/5 dark:bg-[#060f0c]/90">
           <div className="mb-8 flex items-start justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-primary-light">Student Signup</p>
@@ -318,7 +318,7 @@ export default function SignupPage() {
                   />
                 </div>
 
-                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600">
+                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600 dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400">
                   Your academic data will be collected in the next step before the account is submitted.
                 </div>
 
@@ -376,7 +376,7 @@ export default function SignupPage() {
                         value={formData.level}
                         onChange={handleChange}
                         disabled={loading}
-                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
                       >
                         {levels.map((level) => (
                           <option key={level} value={level}>
@@ -388,7 +388,7 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600">
+                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600 dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400">
                  
                 </div>
 
@@ -447,7 +447,7 @@ function AuthField({
         <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
         <input
           {...props}
-          className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
         />
       </div>
     </div>

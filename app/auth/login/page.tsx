@@ -51,9 +51,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.14),_transparent_28%),linear-gradient(160deg,#f7fff8_0%,#eefcf4_42%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.2),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.16),_transparent_28%),linear-gradient(160deg,#03130b_0%,#07140d_42%,#020617_100%)] px-4 py-10">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.18),_transparent_28%),linear-gradient(160deg,#f7fff8_0%,#eefcf4_42%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.15),_transparent_32%),linear-gradient(160deg,#040d0a_0%,#050f0c_45%,#020617_100%)] px-4 py-10">
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl gap-8 lg:grid-cols-[1fr,0.95fr] lg:items-center">
-        <Card className="order-2 rounded-[2.75rem] border border-white/70 bg-white/88 p-7 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur lg:order-1 lg:p-10">
+        <Card className="order-2 rounded-[3.5rem] border border-white/70 bg-white/88 p-7 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur lg:order-1 lg:p-12 dark:border-white/5 dark:bg-[#060f0c]/90">
           <div className="mb-8">
             <p className="text-[10px] font-black uppercase tracking-[0.28em] text-primary-light">Student Login</p>
             <h1 className="mt-3 text-3xl font-black uppercase tracking-tight text-text-light dark:text-text-dark md:text-4xl">
@@ -81,7 +81,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
                   placeholder="student@example.com"
                   required
                   disabled={loading}
@@ -104,7 +104,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
                   placeholder="Enter your password"
                   required
                   disabled={loading}
@@ -112,7 +112,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600">
+            <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600 dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400">
               Your student profile stays linked to the academic identity collected during signup, including faculty, department, and level.
             </div>
 
@@ -129,7 +129,7 @@ export default function LoginPage() {
           </p>
         </Card>
 
-        <section className="order-1 relative overflow-hidden rounded-[2.75rem] bg-[#08130f] p-8 text-white shadow-[0_28px_80px_rgba(2,6,23,0.28)] lg:order-2 lg:p-12">
+        <section className="order-1 relative overflow-hidden rounded-[3.5rem] bg-[#050f0c] p-8 text-white shadow-[0_28px_80px_rgba(2,6,23,0.35)] lg:order-2 lg:p-12 border border-white/5">
           <div className="absolute -top-20 right-0 h-64 w-64 rounded-full bg-green-400/20 blur-3xl" />
           <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-sky-400/10 blur-3xl" />
           <div className="relative z-10">

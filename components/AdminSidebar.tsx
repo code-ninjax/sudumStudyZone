@@ -16,7 +16,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Library
+  Library,
+  Video
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 
@@ -24,6 +25,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
   { icon: Users, label: 'Students', href: '/admin/students' },
   { icon: BookOpen, label: 'Assignments Management', href: '/admin/assignments' },
+  { icon: Video, label: 'Online Classes', href: '/admin/schedule-class' },
   { icon: FileText, label: 'Write Blog', href: '/admin/blog' },
   { icon: FileText, label: 'Manage Blogs', href: '/admin/blog/manage' },
   { icon: BarChart3, label: 'Blog Categories', href: '/admin/blog/categories' },

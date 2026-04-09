@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Award, TrendingUp, BookOpen, FileText, Calendar, Target, Flame, Trophy, LogOut, Clock, ChevronRight, ClipboardList, CheckSquare } from 'lucide-react'
+import { Award, TrendingUp, BookOpen, FileText, Calendar, Target, Flame, Trophy, LogOut, Clock, ChevronRight, ClipboardList, CheckSquare, Video, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
@@ -18,6 +18,7 @@ export default function StudentDashboardPage() {
   const [assignments, setAssignments] = useState<any[]>([])
   const [submissions, setSubmissions] = useState<any[]>([])
   const [recentPosts, setRecentPosts] = useState<any[]>([])
+  const [onlineClasses, setOnlineClasses] = useState<any[]>([])
   const [coursesLoading, setCoursesLoading] = useState(true)
 
   useEffect(() => {
@@ -27,7 +28,8 @@ export default function StudentDashboardPage() {
         Promise.all([
           fetchEnrolledCourses(), 
           fetchAssignments(),
-          fetchRecentBlogPosts()
+          fetchRecentBlogPosts(),
+          fetchOnlineClasses()
         ])
       } else {
         // No user ID - set loading to false to show content
@@ -120,6 +122,23 @@ export default function StudentDashboardPage() {
       setRecentPosts(posts || [])
     } catch (err) {
       console.error('Error loading blog posts:', err)
+    }
+  }
+
+  const fetchOnlineClasses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('online_classes')
+        .select('*')
+        .eq('level', profile?.level || '100L')
+        .gte('date', new Date().toISOString().split('T')[0])
+        .order('date', { ascending: true })
+        .order('time', { ascending: true })
+
+      if (error) throw error
+      setOnlineClasses(data || [])
+    } catch (err) {
+      console.error('Error fetching online classes:', err)
     }
   }
 
@@ -282,6 +301,69 @@ export default function StudentDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Active Assignments Command Area */}
         <div className="lg:col-span-8 space-y-10">
+          {/* Online Classes Section */}
+          {onlineClasses.length > 0 && (
+            <section className="bg-premium-gradient rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl font-black tracking-tight uppercase">Incoming Transmissions</h2>
+                    <p className="text-[10px] font-black uppercase tracking-[0.25em] opacity-70 mt-1">Live Online Lectures</p>
+                  </div>
+                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
+                    <Video className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {onlineClasses.map((cls) => {
+                    // Check if class is active (within 1 hour of start time)
+                    const now = new Date()
+                    const classDate = new Date(`${cls.date}T${cls.time}`)
+                    const diffMs = now.getTime() - classDate.getTime()
+                    const diffMins = diffMs / (1000 * 60)
+                    const isActive = diffMins >= -15 && diffMins <= 120 // 15 mins before to 2 hours after
+
+                    return (
+                      <div key={cls.id} className="p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all hover:bg-white/20">
+                        <div className="flex flex-col sm:flex-row items-center gap-6">
+                          <div className="w-14 h-14 bg-white/20 rounded-2xl flex flex-col items-center justify-center text-center">
+                            <p className="text-[8px] font-black uppercase">{new Date(cls.date).toLocaleDateString(undefined, { month: 'short' })}</p>
+                            <p className="text-xl font-black leading-none">{new Date(cls.date).getDate()}</p>
+                          </div>
+                          <div>
+                            <h3 className="font-black text-lg tracking-tight uppercase leading-tight">{cls.title}</h3>
+                            <div className="flex items-center gap-3 mt-1 opacity-70">
+                               <p className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5"><BookOpen className="w-3 h-3" /> {cls.course_code}</p>
+                               <p className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5"><Clock className="w-3 h-3" /> {cls.time.substring(0, 5)}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {isActive ? (
+                          <a 
+                            href={cls.meet_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto px-8 py-3 bg-yellow-400 text-black font-black uppercase text-[10px] tracking-[0.2em] rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 group/btn"
+                          >
+                            Join Mission Now
+                            <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+                          </a>
+                        ) : (
+                          <div className="px-8 py-3 bg-white/10 border border-white/20 text-white/50 font-black uppercase text-[10px] tracking-[0.2em] rounded-xl">
+                            Deploying Soon
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
+
           <section className="bg-white dark:bg-subtle-dark rounded-[2.5rem] p-10 border border-gray-100 dark:border-gray-800 shadow-sm">
             <div className="flex items-center justify-between mb-10">
               <div>
