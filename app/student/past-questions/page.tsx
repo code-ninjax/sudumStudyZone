@@ -70,75 +70,13 @@ export default function StudentPastQuestionsPage() {
         </div>
 
         <div className="grid gap-6">
-          {resources.length === 0 ? (
-            <div className="rounded-[2rem] border border-dashed border-gray-200 bg-gray-50 px-6 py-14 text-center dark:border-white/10 dark:bg-white/5">
-              <BookCopy className="mx-auto h-10 w-10 text-gray-300" />
-              <p className="mt-4 text-sm font-bold text-gray-500 dark:text-gray-400">
-                No past questions match the current level yet.
-              </p>
-            </div>
-          ) : (
-            resources.map((resource) => (
-              <article
-                key={resource.id}
-                className="grid gap-5 rounded-[2rem] border border-gray-100 bg-gray-50 p-6 transition hover:-translate-y-1 hover:shadow-lg dark:border-white/5 dark:bg-white/5 lg:grid-cols-[1fr,auto]"
-              >
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-primary-light/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-primary-light">
-                      {resource.courseCode}
-                    </span>
-                    <span className="rounded-full bg-black/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-gray-500 dark:bg-white/10 dark:text-gray-300">
-                      {resource.level}
-                    </span>
-                    <span className="rounded-full bg-black/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-gray-500 dark:bg-white/10 dark:text-gray-300">
-                      {resource.year}
-                    </span>
-                  </div>
-                  <h3 className="mt-4 text-2xl font-black uppercase tracking-tight text-text-light dark:text-text-dark">
-                    {resource.title}
-                  </h3>
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-gray-600 dark:text-gray-300">
-                    {resource.summary}
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {resource.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-gray-200 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-gray-500 dark:border-white/10 dark:text-gray-300"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex min-w-52 flex-col justify-between gap-5 rounded-[1.75rem] bg-white p-5 shadow-sm dark:bg-black/20">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 text-sm font-bold text-text-light dark:text-text-dark">
-                      <FileBadge2 className="h-4 w-4 text-primary-light" />
-                      {resource.format}
-                    </div>
-                    <div className="flex items-center gap-3 text-sm font-bold text-text-light dark:text-text-dark">
-                      <BookCopy className="h-4 w-4 text-primary-light" />
-                      {resource.pages} pages
-                    </div>
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-400">
-                      {resource.department}, {resource.faculty}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-premium-gradient px-5 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-white"
-                  >
-                    <Download className="h-4 w-4" />
-                    Open Resource
-                  </button>
-                </div>
-              </article>
-            ))
-          )}
+          <div className="rounded-[2rem] border border-dashed border-gray-200 bg-gray-50 px-6 py-20 text-center dark:border-white/10 dark:bg-white/5">
+            <Clock3 className="mx-auto h-12 w-12 text-gray-300 animate-pulse" />
+            <h3 className="mt-6 text-xl font-black uppercase tracking-tight text-text-light dark:text-text-dark">Coming Soon</h3>
+            <p className="mt-3 max-w-md mx-auto text-sm font-medium leading-relaxed text-gray-500 dark:text-gray-400">
+              We are actively porting all localized examination past questions into the new system. Check back later!
+            </p>
+          </div>
         </div>
       </section>
     </div>

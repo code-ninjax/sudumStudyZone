@@ -9,7 +9,8 @@ export async function getAllAssignments(level?: string): Promise<Assignment[]> {
         .from("assignments")
         .select(`
       *,
-      profiles:instructor_id(full_name)
+      profiles:instructor_id(full_name),
+      assignment_departments(department_id)
     `)
         .order("created_at", { ascending: false });
 
@@ -35,7 +36,8 @@ export async function getAssignmentById(id: string): Promise<Assignment | null> 
         .from("assignments")
         .select(`
       *,
-      profiles:instructor_id(full_name)
+      profiles:instructor_id(full_name),
+      assignment_departments(department_id)
     `)
         .eq("id", id)
         .single();
@@ -53,7 +55,7 @@ export async function getAssignmentById(id: string): Promise<Assignment | null> 
  */
 export async function createAssignment(
     instructorId: string,
-    assignmentData: CreateAssignmentInput
+    assignmentData: CreateAssignmentInput & { department_ids?: string[] }
 ) {
     const { data, error } = await supabase
         .from("assignments")
@@ -72,6 +74,22 @@ export async function createAssignment(
     if (error) {
         console.error("Error creating assignment:", error);
         throw error;
+    }
+
+    if (assignmentData.department_ids && assignmentData.department_ids.length > 0) {
+        const junctionData = assignmentData.department_ids.map(dep_id => ({
+            assignment_id: data.id,
+            department_id: dep_id
+        }));
+
+        const { error: junctionError } = await supabase
+            .from("assignment_departments")
+            .insert(junctionData);
+
+        if (junctionError) {
+            console.error("Error creating assignment department links:", junctionError);
+            throw junctionError;
+        }
     }
 
     return data;

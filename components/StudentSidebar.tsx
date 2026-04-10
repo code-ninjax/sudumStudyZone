@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
-  CheckSquare
+  CheckSquare,
+  Video
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 
@@ -25,6 +26,7 @@ const menuItems = [
   { icon: BookOpen, label: 'My Assignments', href: '/student/assignments' },
   { icon: FileText, label: 'Result Scores', href: '/student/scores' },
   { icon: Lightbulb, label: 'Study Hub', href: '/student/study-hub' },
+  { icon: Video, label: 'Online Classes', href: '/student/online-classes' },
   { icon: ClipboardList, label: 'Past Questions', href: '/student/past-questions' },
   { icon: CheckSquare, label: 'Marking Scheme', href: '/student/marking-schemes' },
   { icon: Library, label: 'eBooks', href: '/student/ebooks' },

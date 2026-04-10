@@ -4,6 +4,7 @@ import type { ChangeEvent, FormEvent, InputHTMLAttributes } from 'react'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/packages/supabase/src/client'
 import {
   ArrowLeft,
   ArrowRight,
@@ -29,11 +30,11 @@ const levels = ['100L', '200L', '300L', '400L', '500L']
 
 export default function SignupPage() {
   const [step, setStep] = useState<1 | 2>(1)
+  const [departments, setDepartments] = useState<{id: string, name: string}[]>([])
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    faculty: '',
-    department: '',
+    department_id: '',
     level: '100L',
     matricNumber: '',
     password: '',
@@ -50,6 +51,14 @@ export default function SignupPage() {
       router.push('/student')
     }
   }, [router, user])
+
+  useEffect(() => {
+    const fetchDeps = async () => {
+      const { data } = await supabase.from('departments').select('id, name').order('name')
+      if (data) setDepartments(data)
+    }
+    fetchDeps()
+  }, [])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData((current) => ({
@@ -79,8 +88,8 @@ export default function SignupPage() {
   }
 
   const validateAcademicStep = () => {
-    if (!formData.faculty.trim() || !formData.department.trim() || !formData.level || !formData.matricNumber.trim()) {
-      setError('Faculty, department, level, and matric number are required.')
+    if (!formData.department_id || !formData.level || !formData.matricNumber.trim()) {
+      setError('Department, level, and matric number are required.')
       return false
     }
 
@@ -110,8 +119,7 @@ export default function SignupPage() {
         email: formData.email.trim(),
         password: formData.password,
         fullName: formData.fullName.trim(),
-        faculty: formData.faculty.trim(),
-        department: formData.department.trim(),
+        department_id: formData.department_id,
         level: formData.level,
         matricNumber: formData.matricNumber.trim(),
         redirectTo: `${window.location.origin}/auth/verify`,
@@ -176,8 +184,7 @@ export default function SignupPage() {
                 <div className="mt-8 rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
                   <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/45">Student Summary</p>
                   <p className="mt-3 text-sm font-bold">{formData.fullName}</p>
-                  <p className="mt-2 text-sm text-white/70">{formData.faculty}</p>
-                  <p className="mt-1 text-sm text-white/70">{formData.department}</p>
+                  <p className="mt-2 text-sm text-white/70">Department Selected</p>
                   <p className="mt-1 text-sm text-white/70">{formData.matricNumber}</p>
                   <p className="mt-4 inline-flex rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-green-300">
                     {formData.level}
@@ -214,7 +221,7 @@ export default function SignupPage() {
               Create the account, then capture the academic criteria before submission.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-white/75">
-              This signup flow now gives faculty, department, and level their own dedicated step so the client requirement is visible and explicit.
+              This signup flow now gives department and level their own dedicated step so the client requirement is visible and explicit.
             </p>
 
             <div className="mt-10 space-y-4">
@@ -226,7 +233,7 @@ export default function SignupPage() {
               <StepPreview
                 index="02"
                 title="Academic Criteria"
-                text="Collect faculty, department, and level before account creation."
+                text="Collect department and level before account creation."
               />
               <StepPreview
                 index="03"
@@ -334,27 +341,31 @@ export default function SignupPage() {
             ) : (
               <>
                 <div className="grid gap-5 md:grid-cols-2">
-                  <AuthField
-                    icon={Building2}
-                    label="Faculty"
-                    name="faculty"
-                    value={formData.faculty}
-                    onChange={handleChange}
-                    placeholder="Faculty of Science"
-                    disabled={loading}
-                  />
-                  <AuthField
-                    icon={GraduationCap}
-                    label="Department"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleChange}
-                    placeholder="Computer Science"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="grid gap-5 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-gray-500">
+                      Department
+                    </label>
+                    <div className="relative">
+                      <Building2 className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <select
+                        name="department_id"
+                        value={formData.department_id}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
+                      >
+                        <option value="" disabled className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                          Select a department
+                        </option>
+                        {departments.map((dept) => (
+                          <option key={dept.id} value={dept.id} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                            {dept.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                   <AuthField
                     icon={Hash}
                     label="Matric Number"
@@ -379,7 +390,7 @@ export default function SignupPage() {
                         className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
                       >
                         {levels.map((level) => (
-                          <option key={level} value={level}>
+                          <option key={level} value={level} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                             {level}
                           </option>
                         ))}

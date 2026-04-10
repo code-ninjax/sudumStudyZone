@@ -17,14 +17,18 @@ import {
   ChevronLeft,
   ChevronRight,
   Library,
-  Video
+  Video,
+  Building,
+  Layers
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
   { icon: Users, label: 'Students', href: '/admin/students' },
-  { icon: BookOpen, label: 'Assignments Management', href: '/admin/assignments' },
+  { icon: Building, label: 'Departments', href: '/admin/departments' },
+  { icon: BookOpen, label: 'Assignments', href: '/admin/assignments' },
+  { icon: Layers, label: 'Marking Schemes', href: '/admin/marking-schemes' },
   { icon: Video, label: 'Online Classes', href: '/admin/schedule-class' },
   { icon: FileText, label: 'Write Blog', href: '/admin/blog' },
   { icon: FileText, label: 'Manage Blogs', href: '/admin/blog/manage' },

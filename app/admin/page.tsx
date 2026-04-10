@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Users, BookOpen, FileText, TrendingUp, Upload, Plus, DollarSign, Eye, Clock, UserPlus, Library } from 'lucide-react'
+import { Users, BookOpen, FileText, TrendingUp, Upload, Plus, DollarSign, Eye, Clock, UserPlus, Library, Video } from 'lucide-react'
 import Link from 'next/link'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
@@ -201,8 +201,16 @@ export default function AdminPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Publish research insights, announcements, and study guides.</p>
               </Link>
               
-              <button className="group p-8 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-transparent hover:border-yellow-500/30 transition-all duration-300 hover:bg-white dark:hover:bg-subtle-dark text-left">
+              <Link href="/admin/schedule-class" className="group p-8 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-transparent hover:border-yellow-500/30 transition-all duration-300 hover:bg-white dark:hover:bg-subtle-dark">
                 <div className="w-12 h-12 bg-yellow-400 text-white rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform">
+                  <Video className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-text-light dark:text-text-dark mb-2">Online Class Hub</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Coordinate live transmissions and manage upcoming virtual lectures.</p>
+              </Link>
+
+              <button className="group p-8 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-transparent hover:border-orange-500/30 transition-all duration-300 hover:bg-white dark:hover:bg-subtle-dark text-left">
+                <div className="w-12 h-12 bg-orange-400 text-white rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-orange-400/20 group-hover:scale-110 transition-transform">
                   <Library className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-text-light dark:text-text-dark mb-2">Curriculum Hub</h3>

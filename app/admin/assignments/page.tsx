@@ -11,11 +11,13 @@ import {
   gradeSubmission 
 } from '@/packages/supabase/src/assignments'
 import { useAuth } from '@/lib/auth-context'
+import { supabase } from '@/packages/supabase/src/client'
 
 export default function AdminAssignmentsPage() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [assignments, setAssignments] = useState<any[]>([])
+  const [departments, setDepartments] = useState<{id: string, name: string}[]>([])
   const [visibleCount, setVisibleCount] = useState(3)
   const [expandedAssignment, setExpandedAssignment] = useState<string | null>(null)
   const [submissions, setSubmissions] = useState<{ [key: string]: any[] }>({})
@@ -36,12 +38,24 @@ export default function AdminAssignmentsPage() {
     course_code: '',
     level: '100L',
     due_date: '',
-    max_score: 100
+    max_score: 100,
+    department_ids: [] as string[]
   })
+
+  // Filters State
+  const [filterDepartment, setFilterDepartment] = useState('')
+  const [filterLevel, setFilterLevel] = useState('')
+  const [filterCourse, setFilterCourse] = useState('')
 
   useEffect(() => {
     fetchAssignments()
+    fetchDepartments()
   }, [])
+
+  async function fetchDepartments() {
+    const { data } = await supabase.from('departments').select('id, name').order('name')
+    if (data) setDepartments(data)
+  }
 
   async function fetchAssignments() {
     setLoading(true)
@@ -54,6 +68,32 @@ export default function AdminAssignmentsPage() {
       setLoading(false)
     }
   }
+
+  const toggleDepartmentSelection = (deptId: string) => {
+    setNewAssignment(prev => {
+      const isSelected = prev.department_ids.includes(deptId)
+      return {
+        ...prev,
+        department_ids: isSelected 
+          ? prev.department_ids.filter(id => id !== deptId)
+          : [...prev.department_ids, deptId]
+      }
+    })
+  }
+
+  // Define levels from the previous component for reuse
+  const levels = ['100L', '200L', '300L', '400L', '500L', 'Postgraduate']
+
+  // Filter Logic
+  const filteredAssignments = assignments.filter(assignment => {
+    const matchLevel = filterLevel ? assignment.level === filterLevel : true
+    const matchCourse = filterCourse ? assignment.course_code.toLowerCase().includes(filterCourse.toLowerCase()) : true
+    const matchDept = filterDepartment 
+      ? assignment.assignment_departments?.some((ad: any) => ad.department_id === filterDepartment)
+      : true
+    
+    return matchLevel && matchCourse && matchDept
+  })
 
   async function handleExpand(assignmentId: string) {
     if (expandedAssignment === assignmentId) {
@@ -85,7 +125,8 @@ export default function AdminAssignmentsPage() {
         course_code: '',
         level: '100L',
         due_date: '',
-        max_score: 100
+        max_score: 100,
+        department_ids: []
       })
       fetchAssignments()
     } catch (error) {
@@ -151,9 +192,53 @@ export default function AdminAssignmentsPage() {
         </div>
       </div>
 
+      {/* Filters Area */}
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Filter By Department</label>
+          <select 
+            className="w-full bg-white dark:bg-subtle-dark border border-gray-100 dark:border-gray-800 rounded-xl px-5 py-3 text-sm font-bold focus:ring-2 focus:ring-primary-light transition-all outline-none"
+            value={filterDepartment}
+            onChange={(e) => setFilterDepartment(e.target.value)}
+          >
+            <option value="" className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">All Departments</option>
+            {departments.map(dept => (
+              <option key={dept.id} value={dept.id} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">{dept.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+           <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Filter By Level</label>
+           <select 
+            className="w-full bg-white dark:bg-subtle-dark border border-gray-100 dark:border-gray-800 rounded-xl px-5 py-3 text-sm font-bold focus:ring-2 focus:ring-primary-light transition-all outline-none"
+            value={filterLevel}
+            onChange={(e) => setFilterLevel(e.target.value)}
+          >
+            <option value="" className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">All Levels</option>
+            {levels.map(l => (
+              <option key={l} value={l} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">{l}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+           <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Filter By Course Code</label>
+           <input 
+             placeholder="e.g. CSC 401"
+             className="w-full bg-white dark:bg-subtle-dark border border-gray-100 dark:border-gray-800 rounded-xl px-5 py-3 text-sm font-bold focus:ring-2 focus:ring-primary-light transition-all outline-none"
+             value={filterCourse}
+             onChange={(e) => setFilterCourse(e.target.value)}
+           />
+        </div>
+      </div>
+
       {/* Assignments List */}
       <div className="space-y-6">
-        {assignments.slice(0, visibleCount).map((assignment) => (
+        {filteredAssignments.length === 0 ? (
+          <div className="py-12 bg-white dark:bg-subtle-dark rounded-3xl border border-gray-100 dark:border-gray-800 text-center">
+            <p className="text-gray-400 font-bold tracking-tight">No assignments match your filters.</p>
+          </div>
+        ) : 
+          filteredAssignments.slice(0, visibleCount).map((assignment) => (
           <div key={assignment.id} className="group bg-white dark:bg-subtle-dark rounded-[2rem] border border-gray-100 dark:border-gray-800 overflow-hidden transition-all hover:shadow-2xl">
             <div className={`p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${expandedAssignment === assignment.id ? 'bg-gray-50/50 dark:bg-gray-800/20' : ''}`}>
               <div className="flex-1">
@@ -274,7 +359,7 @@ export default function AdminAssignmentsPage() {
           </div>
         ))}
         
-        {visibleCount < assignments.length && (
+        {visibleCount < filteredAssignments.length && (
           <button 
             onClick={() => setVisibleCount(prev => prev + 3)}
             className="w-full py-6 mt-8 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-3xl text-[10px] font-black text-gray-400 uppercase tracking-[0.5em] hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-light transition-all"
@@ -326,12 +411,37 @@ export default function AdminAssignmentsPage() {
                     value={newAssignment.level}
                     onChange={e => setNewAssignment({...newAssignment, level: e.target.value})}
                   >
-                    <option>100L</option>
-                    <option>200L</option>
-                    <option>300L</option>
-                    <option>400L</option>
-                    <option>500L</option>
+                    {levels.map(l => (
+                      <option key={l} value={l} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">{l}</option>
+                    ))}
                   </select>
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block">Target Departments (Select Multiple)</label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {departments.map((dept) => (
+                      <label 
+                        key={dept.id} 
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                          newAssignment.department_ids.includes(dept.id) 
+                            ? 'bg-primary-light/10 border-primary-light text-primary-light' 
+                            : 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={newAssignment.department_ids.includes(dept.id)}
+                          onChange={() => toggleDepartmentSelection(dept.id)}
+                          className="w-4 h-4 text-primary-light bg-white border-gray-300 rounded focus:ring-primary-light"
+                        />
+                        <span className="text-xs font-bold line-clamp-1">{dept.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {departments.length === 0 && (
+                     <p className="text-xs text-red-500 font-bold mt-2">No departments established. Please create one in the Department Hub first.</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

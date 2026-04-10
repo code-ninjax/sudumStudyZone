@@ -1,20 +1,42 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowUpRight, ClipboardCheck, FileSearch, GraduationCap, LayoutList, Sparkles } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
-import { filterResourcesByProfileLevel, markingSchemes } from '@/lib/student-resources'
 import PrintButton from '@/components/PrintButton'
+import { supabase } from '@/packages/supabase/src/client'
 
 export default function StudentMarkingSchemesPage() {
   const { loading, profile } = useAuth()
+  const [resources, setResources] = useState<any[]>([])
+  const [fetching, setFetching] = useState(true)
 
-  if (loading) {
-    return <DashboardSkeleton />
+  useEffect(() => {
+    if (!loading) fetchSchemes()
+  }, [loading])
+
+  const fetchSchemes = async () => {
+    setFetching(true)
+    try {
+      const { data, error } = await supabase
+        .from('marking_schemes')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (error) throw error
+      setResources(data || [])
+    } catch (err) {
+      console.error('Error fetching marking schemes', err)
+    } finally {
+      setFetching(false)
+    }
   }
 
-  const resources = filterResourcesByProfileLevel(markingSchemes, profile?.level)
+  if (loading || fetching) {
+    return <DashboardSkeleton />
+  }
 
   return (
     <div className="mx-auto max-w-6xl animate-fade-in px-4 py-8">
@@ -64,14 +86,13 @@ export default function StudentMarkingSchemesPage() {
                 className="rounded-[2rem] border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-white/5 dark:bg-subtle-dark"
               >
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-primary-light/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-primary-light">
-                    {resource.courseCode}
-                  </span>
+                  {resource.course_code && (
+                    <span className="rounded-full bg-primary-light/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-primary-light">
+                      {resource.course_code}
+                    </span>
+                  )}
                   <span className="rounded-full bg-black/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-gray-500 dark:bg-white/10 dark:text-gray-300">
-                    {resource.level}
-                  </span>
-                  <span className="rounded-full bg-black/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-gray-500 dark:bg-white/10 dark:text-gray-300">
-                    {resource.year}
+                    {new Date(resource.created_at).getFullYear()}
                   </span>
                 </div>
 
@@ -81,33 +102,24 @@ export default function StudentMarkingSchemesPage() {
                       {resource.title}
                     </h2>
                     <p className="mt-3 text-sm leading-7 text-gray-600 dark:text-gray-300">
-                      {resource.summary}
+                      Official marking scheme and grading rubric.
                     </p>
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      {resource.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full border border-gray-200 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-gray-500 dark:border-white/10 dark:text-gray-300"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   </div>
 
                   <div className="min-w-56 rounded-[1.75rem] bg-gray-50 p-5 dark:bg-white/5">
                     <div className="space-y-3">
-                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Course Context</p>
-                      <p className="text-sm font-bold text-text-light dark:text-text-dark">{resource.department}</p>
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500">{resource.faculty}</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Context</p>
+                      <p className="text-sm font-bold text-text-light dark:text-text-dark">Global Marking Standards</p>
                     </div>
-                    <button
-                      type="button"
-                      className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-5 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-white dark:bg-white dark:text-black"
+                    <a
+                      href={resource.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-5 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-white dark:bg-white dark:text-black transition-transform hover:scale-105 active:scale-95"
                     >
                       <ArrowUpRight className="h-4 w-4" />
-                      Review Guide
-                    </button>
+                      View Scheme
+                    </a>
                   </div>
                 </div>
               </article>
