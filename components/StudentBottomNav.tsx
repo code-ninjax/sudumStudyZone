@@ -30,6 +30,7 @@ const primaryLinks = [
 ]
 
 const otherLinks = [
+  { icon: FileText, label: 'Result Scores', href: '/student/scores' },
   { icon: Lightbulb, label: 'Study Hub', href: '/student/study-hub' },
   { icon: Video, label: 'Online Classes', href: '/student/online-classes' },
   { icon: ClipboardList, label: 'Past Questions', href: '/student/past-questions' },

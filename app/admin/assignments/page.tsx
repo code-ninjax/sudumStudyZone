@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Edit2, Trash2, Users, FileText, Calendar, Clock, ChevronDown, ChevronUp, Download, CheckCircle2, XCircle } from 'lucide-react'
+import { Plus, Edit2, Trash2, Users, FileText, Calendar, Clock, ChevronDown, ChevronUp, Download, CheckCircle2, XCircle, Printer } from 'lucide-react'
 import CountingAnimation from '@/components/CountingAnimation'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
 import { 
@@ -147,6 +147,15 @@ export default function AdminAssignmentsPage() {
       setSubmissions(prev => ({ ...prev, [evalData.assignmentId]: data }))
     } catch (error) {
       alert('Failed to evaluate submission')
+    }
+  }
+
+  const handlePrint = (url: string) => {
+    // Open the PDF in a new tab. Browsers' PDF viewers have a built-in print button.
+    // This is the most reliable way to handle cross-origin files like Supabase storage.
+    const win = window.open(url, '_blank');
+    if (win) {
+      win.focus();
     }
   }
 

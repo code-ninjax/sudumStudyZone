@@ -95,7 +95,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-subtle-light dark:bg-background-dark py-12">
+    <div className="min-h-screen bg-subtle-light dark:bg-background-dark py-12 overflow-x-hidden">
       <div className="container-custom">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
@@ -162,9 +162,9 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           </Card>
 
           {/* Article Content */}
-          <Card className="prose prose-lg dark:prose-invert max-w-none mb-8 animate-slide-up">
+          <Card className="prose prose-lg dark:prose-invert max-w-none mb-8 animate-slide-up overflow-hidden break-words">
             <div 
-              className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"
+              className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap break-words"
               dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
             />
           </Card>
