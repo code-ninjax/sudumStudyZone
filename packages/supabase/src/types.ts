@@ -8,6 +8,7 @@ export interface Profile {
   role: 'admin' | 'student';
   faculty: string | null;
   department: string | null;
+  department_id: string | null;
   level: string | null;
   matric_number: string | null;
   created_at: string;
@@ -202,6 +203,7 @@ export interface AssignmentSubmission {
   file_size: number | null;
   score: number | null;
   feedback: string | null;
+  department_id: string | null;
   submitted_at: string;
   profiles?: {
     full_name: string | null;

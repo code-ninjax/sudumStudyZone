@@ -214,3 +214,20 @@ export async function getEnrollmentDetails(studentId: string) {
   return data || [];
 }
 
+
+/**
+ * Fetch all departments
+ */
+export async function getAllDepartments() {
+  const { data, error } = await supabase
+    .from("departments")
+    .select("*")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching departments:", error);
+    return [];
+  }
+
+  return data || [];
+}

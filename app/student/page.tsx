@@ -197,25 +197,25 @@ export default function StudentDashboardPage() {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-[120px] -mr-64 -mt-64 transition-transform duration-1000 group-hover:scale-110"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-black/10 rounded-full blur-[100px] -ml-40 -mb-40"></div>
         
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
-          <div className="flex items-center gap-8">
-            <div className="relative">
-              <div className="w-28 h-28 rounded-3xl overflow-hidden bg-white/20 backdrop-blur-md flex items-center justify-center text-4xl font-black border-2 border-white/30 text-white shadow-inner transform transition-transform duration-700 hover:rotate-6">
+        <div className="relative z-10 flex flex-col md:flex-row items-center md:items-center justify-between gap-10">
+          <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 sm:gap-8 text-center sm:text-left">
+            <div className="relative shrink-0">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl sm:text-4xl font-black border-2 border-white/30 text-white shadow-inner transform transition-transform duration-700 hover:rotate-6">
                 {initials}
               </div>
-              <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-black shadow-lg border-4 border-primary-light">
-                < Award className="w-5 h-5" />
+              <div className="absolute -bottom-2 -right-2 w-9 h-9 sm:w-10 sm:h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-black shadow-lg border-4 border-primary-light">
+                < Award className="w-4 h-4 sm:w-5 h-5" />
               </div>
             </div>
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-4 border border-white/30">
+            <div className="flex flex-col items-center sm:items-start">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] mb-4 border border-white/30">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
                 Student Dynamic
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black mb-3 tracking-tighter uppercase leading-none">
+              <h1 className="text-2xl sm:text-4xl font-black mb-3 tracking-tighter uppercase leading-none">
                 Salute, <span className="text-yellow-300">{firstName}!</span>
               </h1>
-              <p className="text-lg opacity-90 font-medium max-w-xl leading-relaxed">
+              <p className="text-base sm:text-lg opacity-90 font-medium max-w-xl leading-relaxed">
                 Your intellectual trajectory is climbing. Ready to conquer your <span className="text-yellow-200 font-black">assignments</span> today?
               </p>
             </div>

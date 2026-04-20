@@ -101,7 +101,7 @@ export async function createAssignment(
 export async function submitAssignment(
     assignmentId: string,
     studentId: string,
-    fileData: { file_url: string; file_name: string; file_size: number }
+    fileData: { file_url: string; file_name: string; file_size: number; department_id?: string }
 ) {
     const { data, error } = await supabase
         .from("assignment_submissions")
@@ -111,6 +111,7 @@ export async function submitAssignment(
             file_url: fileData.file_url,
             file_name: fileData.file_name,
             file_size: fileData.file_size,
+            department_id: fileData.department_id,
         })
         .select()
         .single();

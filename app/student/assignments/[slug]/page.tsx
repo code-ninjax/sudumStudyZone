@@ -5,6 +5,7 @@ import { FileText, Calendar, Clock, ArrowLeft, Upload, File, CheckCircle2, Alert
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getAssignmentById, submitAssignment, getStudentSubmission } from '@/packages/supabase/src/assignments'
+import { getAllDepartments } from '@/packages/supabase/src/helpers'
 import { uploadMaterial, getMaterialUrl, STORAGE_BUCKETS } from '@/packages/supabase/src/storage'
 import { useAuth } from '@/lib/auth-context'
 import Button from '@/components/Button'
@@ -13,14 +14,34 @@ export default function AssignmentDetailPage({ params }: { params: { slug: strin
   const router = useRouter()
   const slug = params.slug
   
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [assignment, setAssignment] = useState<any>(null)
   const [existingSubmission, setExistingSubmission] = useState<any>(null)
+  const [departments, setDepartments] = useState<any[]>([])
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    async function fetchDepartments() {
+      try {
+        const data = await getAllDepartments()
+        setDepartments(data || [])
+      } catch (err) {
+        console.error('Error fetching departments:', err)
+      }
+    }
+    fetchDepartments()
+  }, [])
+
+  useEffect(() => {
+    if (profile?.department_id) {
+      setSelectedDepartmentId(profile.department_id)
+    }
+  }, [profile])
 
   useEffect(() => {
     async function fetchData() {
@@ -80,7 +101,8 @@ export default function AssignmentDetailPage({ params }: { params: { slug: strin
       await submitAssignment(assignment.id, user.id, {
         file_url: fileUrl,
         file_name: file.name,
-        file_size: file.size
+        file_size: file.size,
+        department_id: selectedDepartmentId
       })
       
       setSubmitted(true)
@@ -189,6 +211,32 @@ export default function AssignmentDetailPage({ params }: { params: { slug: strin
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Department Selection */}
+                  <div className="space-y-2">
+                    <label htmlFor="department" className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                      Your Department <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="department"
+                        required
+                        value={selectedDepartmentId}
+                        onChange={(e) => setSelectedDepartmentId(e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary-light outline-none transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="" disabled>Select Department</option>
+                        {departments.map((dept) => (
+                          <option key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                        <ChevronRight className="w-4 h-4 rotate-90" />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="relative group">
                     <input
                       type="file"
