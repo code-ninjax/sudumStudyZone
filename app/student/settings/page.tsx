@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Bell, Lock, Eye, Globe, Moon, Sun, Zap } from 'lucide-react'
+import { Bell, Lock, Eye, Globe, Moon, Sun, Zap, ArrowRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 
 const ComingSoonBadge = () => (
   <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold rounded-full">
@@ -26,6 +27,38 @@ export default function StudentSettingsPage() {
       </div>
 
       <div className="grid gap-8">
+        {/* Security Section */}
+        <section className="bg-white/80 dark:bg-subtle-dark/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-sm">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 bg-primary-light/10 dark:bg-primary-dark/10 rounded-2xl flex items-center justify-center">
+              <Lock className="w-6 h-6 text-primary-light dark:text-primary-dark" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-text-light dark:text-text-dark">Security</h2>
+              <p className="text-xs font-black text-gray-400 uppercase tracking-widest mt-1">Account Protection</p>
+            </div>
+          </div>
+
+          <Link
+            href="/auth/forgot-password"
+            className="group flex items-center justify-between p-6 bg-gray-50 dark:bg-white/5 rounded-2xl border border-transparent hover:border-primary-light/20 transition-all duration-300"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
+                <Lock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-text-light dark:text-text-dark">Reset Password</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Change your password via email verification
+                </p>
+              </div>
+            </div>
+            
+            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-light group-hover:translate-x-1 transition-all" />
+          </Link>
+        </section>
+
         {/* Appearance Section - The Only Functional One */}
         <section className="bg-white/80 dark:bg-subtle-dark/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-100 dark:border-white/5 shadow-sm">
           <div className="flex items-center gap-4 mb-8">

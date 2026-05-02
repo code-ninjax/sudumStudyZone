@@ -24,6 +24,7 @@ interface AuthContextType {
     }
   ) => Promise<{ error: any }>
   signOut: () => Promise<void>
+  resetPassword: (email: string) => Promise<{ error: any }>
   isAdmin: boolean
 }
 
@@ -41,11 +42,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // INITIAL SESSION + AUTH STATE LISTENER
   // ======================================================
   useEffect(() => {
+    // Check if we're on the reset-password page
+    const isResetPasswordPage = window.location.pathname === '/auth/reset-password'
+
     // Get initial session from Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) {
+      if (session?.user && !isResetPasswordPage) {
         fetchProfile(session.user.id)
       } else {
         setLoading(false)
@@ -60,10 +64,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      // Check if we're on the reset-password page
+      const isResetPasswordPage = window.location.pathname === '/auth/reset-password'
+      
       setSession(session)
       setUser(session?.user ?? null)
 
-      if (session?.user) {
+      if (session?.user && !isResetPasswordPage) {
         fetchProfile(session.user.id)
       } else {
         setProfile(null)
@@ -195,6 +202,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // ======================================================
+  // RESET PASSWORD
+  // ======================================================
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    })
+
+    return { error }
+  }
+
+  // ======================================================
   // ROLE CHECK
   // ======================================================
   const isAdmin = profile?.role === 'admin'
@@ -209,6 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signOut,
+        resetPassword,
         isAdmin,
       }}
     >

@@ -140,60 +140,60 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.18),_transparent_32%),linear-gradient(160deg,#f8fff8_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.15),_transparent_32%),linear-gradient(160deg,#040d0a_0%,#050f0c_45%,#020617_100%)] px-4 py-12">
-        <div className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-5xl items-center">
-          <Card className="w-full rounded-[3.5rem] border border-white/60 bg-white/85 p-8 shadow-[0_32px_90px_rgba(22,163,74,0.12)] backdrop-blur xl:p-12 dark:border-white/5 dark:bg-[#060f0c]/90">
-            <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4 py-8 sm:py-12">
+        <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center">
+          <Card className="w-full rounded-[2rem] sm:rounded-[3.5rem] border border-gray-200/60 bg-white/95 p-6 sm:p-8 shadow-[0_20px_60px_rgba(22,163,74,0.12)] backdrop-blur xl:p-12 dark:border-gray-800 dark:bg-gray-900/95 dark:shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
+            <div className="grid gap-8 lg:gap-10 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
               <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-700">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-700 dark:border-green-900/50 dark:bg-green-950/30 dark:text-green-400">
                   <CheckCircle2 className="h-4 w-4" />
                   Account Created
                 </div>
-                <h1 className="max-w-xl text-4xl font-black uppercase tracking-tight text-text-light dark:text-text-dark md:text-5xl">
+                <h1 className="max-w-xl text-3xl sm:text-4xl font-black uppercase tracking-tight text-gray-900 dark:text-white md:text-5xl">
                   Verify your email to finish the signup flow.
                 </h1>
-                <p className="mt-5 max-w-xl text-base font-medium leading-7 text-gray-600 dark:text-gray-300">
-                  We sent a verification link to <span className="font-black text-primary-light">{formData.email}</span>.
-                  Your academic criteria were included in the signup request.
+                <p className="mt-5 max-w-xl text-base font-medium leading-7 text-gray-600 dark:text-gray-400">
+                  We sent a verification link to <span className="font-black text-green-600 dark:text-green-400">{formData.email}</span>.
+                  Your student profile has been created with your academic information.
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5 dark:border-white/5 dark:bg-white/[0.03]">
-                    <MailOpen className="mb-3 h-5 w-5 text-primary-light" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 1</p>
-                    <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Open your inbox.</p>
+                  <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800/50">
+                    <MailOpen className="mb-3 h-5 w-5 text-green-600 dark:text-green-400" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500">Step 1</p>
+                    <p className="mt-2 text-sm font-bold text-gray-900 dark:text-white">Open your inbox.</p>
                   </div>
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5 dark:border-white/5 dark:bg-white/[0.03]">
-                    <ShieldCheck className="mb-3 h-5 w-5 text-primary-light" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 2</p>
-                    <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Verify the account.</p>
+                  <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800/50">
+                    <ShieldCheck className="mb-3 h-5 w-5 text-green-600 dark:text-green-400" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500">Step 2</p>
+                    <p className="mt-2 text-sm font-bold text-gray-900 dark:text-white">Verify the account.</p>
                   </div>
-                  <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 p-5 dark:border-white/5 dark:bg-white/[0.03]">
-                    <ArrowRight className="mb-3 h-5 w-5 text-primary-light" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Step 3</p>
-                    <p className="mt-2 text-sm font-bold text-text-light dark:text-text-dark">Sign in and continue.</p>
+                  <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800/50">
+                    <ArrowRight className="mb-3 h-5 w-5 text-green-600 dark:text-green-400" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500">Step 3</p>
+                    <p className="mt-2 text-sm font-bold text-gray-900 dark:text-white">Sign in and continue.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-[2.25rem] bg-black p-8 text-white shadow-2xl">
-                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-white/10">
-                  <MailOpen className="h-8 w-8" />
+              <div className="rounded-[2rem] sm:rounded-[2.25rem] bg-gradient-to-br from-gray-900 to-gray-950 p-6 sm:p-8 text-white shadow-2xl border border-gray-800">
+                <div className="mb-6 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-[1.5rem] bg-green-500/20">
+                  <MailOpen className="h-7 w-7 sm:h-8 sm:w-8 text-green-400" />
                 </div>
-                <h2 className="text-2xl font-black uppercase tracking-tight">Academic Criteria Sent</h2>
-                <div className="mt-8 rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
-                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/45">Student Summary</p>
-                  <p className="mt-3 text-sm font-bold">{formData.fullName}</p>
-                  <p className="mt-2 text-sm text-white/70">Department Selected</p>
-                  <p className="mt-1 text-sm text-white/70">{formData.matricNumber}</p>
-                  <p className="mt-4 inline-flex rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-green-300">
+                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight">Student Profile Created</h2>
+                <div className="mt-8 rounded-[1.75rem] border border-gray-700 bg-gray-800/50 p-5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Student Summary</p>
+                  <p className="mt-3 text-sm font-bold text-white">{formData.fullName}</p>
+                  <p className="mt-2 text-sm text-gray-300">Department Selected</p>
+                  <p className="mt-1 text-sm text-gray-300">{formData.matricNumber}</p>
+                  <p className="mt-4 inline-flex rounded-full bg-green-500/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-green-400">
                     {formData.level}
                   </p>
                 </div>
 
                 <Link
                   href="/auth/login"
-                  className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-black transition-transform hover:scale-[1.02]"
+                  className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-green-600 px-6 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-white transition-transform hover:scale-[1.02] hover:bg-green-700"
                 >
                   Go To Login
                   <ArrowRight className="h-4 w-4" />
@@ -207,20 +207,20 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(22,163,74,0.2),_transparent_30%),linear-gradient(160deg,#f6fff7_0%,#eefcf2_45%,#ffffff_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(34,197,94,0.15),_transparent_32%),linear-gradient(160deg,#040d0a_0%,#050f0c_45%,#020617_100%)] px-4 py-10">
-      <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl gap-8 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
-        <section className="relative overflow-hidden rounded-[3.5rem] bg-[#050f0c] p-8 text-white shadow-[0_28px_80px_rgba(2,6,23,0.35)] lg:p-12 border border-white/5">
-          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-green-400/20 blur-3xl" />
-          <div className="absolute -bottom-20 left-10 h-48 w-48 rounded-full bg-orange-400/10 blur-3xl" />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4 py-6 sm:py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-7xl gap-6 lg:gap-8 lg:grid-cols-[0.95fr,1.05fr] lg:items-center">
+        <section className="relative overflow-hidden hidden rounded-[2rem] lg:rounded-[3.5rem] bg-gradient-to-br from-gray-900 to-gray-950 p-6 sm:p-8 text-white shadow-[0_20px_60px_rgba(0,0,0,0.3)] lg:block lg:p-12 border border-gray-800">
+          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-green-500/20 blur-3xl" />
+          <div className="absolute -bottom-20 left-10 h-48 w-48 rounded-full bg-orange-500/10 blur-3xl" />
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-300">
+            <div className="inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-400">
               <BookOpen className="h-4 w-4" />
               Dedicated Signup Flow
             </div>
-            <h1 className="mt-6 max-w-md text-4xl font-black uppercase leading-none tracking-tight md:text-5xl">
+            <h1 className="mt-6 max-w-md text-3xl sm:text-4xl font-black uppercase leading-none tracking-tight md:text-5xl">
               Create the account, then capture the academic criteria before submission.
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-8 text-white/75">
+            <p className="mt-6 max-w-xl text-base leading-8 text-gray-300">
               This signup flow now gives department and level their own dedicated step so the client requirement is visible and explicit.
             </p>
 
@@ -237,27 +237,27 @@ export default function SignupPage() {
               />
               <StepPreview
                 index="03"
-                title="Supabase Signup"
-                text="Send all fields together in the signup request metadata."
+                title="Complete Signup"
+                text="Submit your details and verify your email to activate your account."
               />
             </div>
           </div>
         </section>
 
-        <Card className="rounded-[3.5rem] border border-white/70 bg-white/88 p-7 shadow-[0_28px_90px_rgba(15,23,42,0.08)] backdrop-blur lg:p-12 dark:border-white/5 dark:bg-[#060f0c]/90">
-          <div className="mb-8 flex items-start justify-between gap-4">
+        <Card className="rounded-[2rem] sm:rounded-[3.5rem] border border-gray-200/70 bg-white/95 p-5 sm:p-7 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur lg:p-12 dark:border-gray-800 dark:bg-gray-900/95 dark:shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
+          <div className="mb-6 sm:mb-8 flex items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-primary-light">Student Signup</p>
-              <h2 className="mt-3 text-3xl font-black uppercase tracking-tight text-text-light dark:text-text-dark">
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-green-600 dark:text-green-400">Student Signup</p>
+              <h2 className="mt-3 text-2xl sm:text-3xl font-black uppercase tracking-tight text-gray-900 dark:text-white">
                 {step === 1 ? 'Account Details' : 'Academic Criteria'}
               </h2>
-              <p className="mt-3 max-w-lg text-sm leading-7 text-gray-600 dark:text-gray-300">
+              <p className="mt-3 max-w-lg text-sm leading-7 text-gray-600 dark:text-gray-400">
                 {step === 1
                   ? 'Step 1 of 2. Create the base account details first.'
-                  : 'Step 2 of 2. These fields are sent to Supabase during signup.'}
+                  : 'Step 2 of 2. Add your academic information to complete your profile.'}
               </p>
             </div>
-            <div className="hidden rounded-[1.5rem] bg-primary-light/10 px-4 py-3 text-[11px] font-black uppercase tracking-[0.22em] text-primary-light sm:block">
+            <div className="hidden rounded-[1.5rem] bg-green-500/10 px-4 py-3 text-[11px] font-black uppercase tracking-[0.22em] text-green-600 dark:text-green-400 sm:block">
               Step {step} / 2
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function SignupPage() {
           </div>
 
           {error && (
-            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
               {error}
             </div>
           )}
@@ -325,14 +325,14 @@ export default function SignupPage() {
                   />
                 </div>
 
-                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600 dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400">
-                  Your academic data will be collected in the next step before the account is submitted.
+                <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-7 text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+                  Your academic information will be collected in the next step to complete your student profile.
                 </div>
 
                 <Button
                   type="button"
                   variant="primary"
-                  className="w-full rounded-2xl py-4 text-[11px] font-black uppercase tracking-[0.24em]"
+                  className="w-full rounded-2xl py-3.5 sm:py-4 text-[11px] font-black uppercase tracking-[0.24em]"
                   onClick={goToAcademicStep}
                 >
                   Continue To Academic Criteria
@@ -353,7 +353,7 @@ export default function SignupPage() {
                         onChange={handleChange}
                         disabled={loading}
                         required
-                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
+                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-3.5 sm:py-4 text-sm font-bold text-gray-900 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-green-400 dark:focus:ring-green-400/10"
                       >
                         <option value="" disabled className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                           Select a department
@@ -381,16 +381,16 @@ export default function SignupPage() {
                       Level
                     </label>
                     <div className="relative">
-                      <Layers3 className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <Layers3 className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                       <select
                         name="level"
                         value={formData.level}
                         onChange={handleChange}
                         disabled={loading}
-                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
+                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-3.5 sm:py-4 text-sm font-bold text-gray-900 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:focus:border-green-400 dark:focus:ring-green-400/10"
                       >
                         {levels.map((level) => (
-                          <option key={level} value={level} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                          <option key={level} value={level} className="text-gray-900 bg-white dark:text-gray-300 dark:bg-gray-800">
                             {level}
                           </option>
                         ))}
@@ -399,8 +399,7 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-gray-100 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-600 dark:border-white/5 dark:bg-white/[0.03] dark:text-gray-400">
-                 
+                <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-7 text-gray-600 dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-300">
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row">
@@ -419,7 +418,7 @@ export default function SignupPage() {
                   <Button
                     type="submit"
                     variant="primary"
-                    className="w-full rounded-2xl py-4 text-[11px] font-black uppercase tracking-[0.24em]"
+                    className="w-full rounded-2xl py-3.5 sm:py-4 text-[11px] font-black uppercase tracking-[0.24em]"
                     loading={loading}
                   >
                     Submit Signup
@@ -429,9 +428,9 @@ export default function SignupPage() {
             )}
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link href="/auth/login" className="font-black text-primary-light hover:underline">
+            <Link href="/auth/login" className="font-black text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
               Sign In
             </Link>
           </p>
@@ -451,14 +450,14 @@ function AuthField({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-gray-500">
+      <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-gray-500 dark:text-gray-400">
         {label}
       </label>
       <div className="relative">
-        <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+        <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
         <input
           {...props}
-          className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-4 text-sm font-bold text-text-light outline-none transition focus:border-primary-light focus:ring-4 focus:ring-primary-light/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:text-text-dark"
+          className="w-full rounded-2xl border border-gray-200 bg-white px-12 py-3.5 sm:py-4 text-sm font-bold text-gray-900 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-green-400 dark:focus:ring-green-400/10"
         />
       </div>
     </div>
@@ -475,10 +474,10 @@ function StepPreview({
   text: string
 }) {
   return (
-    <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
-      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/45">{index}</p>
-      <h3 className="mt-3 text-lg font-black uppercase tracking-tight">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-white/75">{text}</p>
+    <div className="rounded-[1.75rem] border border-gray-700/50 bg-gray-800/50 p-5">
+      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">{index}</p>
+      <h3 className="mt-3 text-lg font-black uppercase tracking-tight text-white">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-gray-300">{text}</p>
     </div>
   )
 }
