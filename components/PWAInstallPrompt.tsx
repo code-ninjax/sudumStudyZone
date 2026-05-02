@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Download, Share2, Smartphone } from 'lucide-react'
+import { X, Share2, Smartphone, Download } from 'lucide-react'
 
 export default function PWAInstallPrompt() {
   const [show, setShow] = useState(false)
@@ -44,44 +44,42 @@ export default function PWAInstallPrompt() {
   if (!show) return null
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 z-[99] animate-slide-up">
-      <div className="bg-white dark:bg-subtle-dark border border-gray-100 dark:border-white/10 rounded-[2rem] p-6 shadow-3xl flex items-center gap-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary-light/5 rounded-full blur-2xl -mr-16 -mt-16"></div>
+    <div className="fixed bottom-4 left-4 right-4 z-[99] sm:bottom-6 sm:left-6 sm:right-6">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 sm:p-5 shadow-xl flex items-center gap-4 relative">
+        <button
+          onClick={() => setShow(false)}
+          className="absolute -top-2 -right-2 rounded-full bg-gray-100 dark:bg-gray-800 p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
         
-        <div className="w-14 h-14 bg-premium-gradient rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-primary-light/20">
-           <Smartphone className="w-7 h-7" />
+        <div className="w-12 h-12 bg-green-500 dark:bg-green-600 rounded-xl flex items-center justify-center text-white shrink-0">
+           <Smartphone className="w-6 h-6" />
         </div>
 
-        <div className="flex-1">
-          <p className="text-xs font-black text-primary-light uppercase tracking-widest mb-1">Install App</p>
-          <h4 className="text-sm font-black text-text-light dark:text-text-dark tracking-tight leading-tight">
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400 mb-0.5">Install App</p>
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate">
             {isIos
-              ? 'Use Share > Add to Home Screen to install Sudum Study Zone.'
-              : 'Install Sudum Study Zone for a better experience.'}
+              ? 'Tap Share, then "Add to Home Screen"'
+              : 'Install Sudum Study Zone'}
           </h4>
         </div>
 
-        <div className="flex flex-col gap-2">
-           {isIos ? (
-             <div className="px-4 py-3 rounded-xl bg-gray-100 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-300 text-center inline-flex items-center gap-2">
-               <Share2 className="w-4 h-4" />
-               Add To Home
-             </div>
-           ) : (
-             <button 
-               onClick={handleInstall}
-               className="px-6 py-3 bg-primary-light text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg"
-             >
-               Install
-             </button>
-           )}
-           <button 
-             onClick={() => setShow(false)}
-             className="text-[8px] font-black uppercase tracking-widest text-gray-400 text-center"
-           >
-             Dismiss
-           </button>
-        </div>
+        {isIos ? (
+          <div className="shrink-0 px-4 py-2.5 rounded-xl bg-green-500 dark:bg-green-600 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+            <Share2 className="w-4 h-4" />
+            <span>Add</span>
+          </div>
+        ) : (
+          <button 
+            onClick={handleInstall}
+            className="shrink-0 px-5 py-2.5 bg-green-500 dark:bg-green-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-green-600 dark:hover:bg-green-500 transition-colors flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            <span>Install</span>
+          </button>
+        )}
       </div>
     </div>
   )
