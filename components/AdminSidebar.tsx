@@ -26,6 +26,7 @@ import { useAuth } from '@/lib/auth-context'
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
   { icon: Users, label: 'Students', href: '/admin/students' },
+  { icon: Building, label: 'Faculties', href: '/admin/faculties' },
   { icon: Building, label: 'Departments', href: '/admin/departments' },
   { icon: BookOpen, label: 'Assignments', href: '/admin/assignments' },
   { icon: Layers, label: 'Marking Schemes', href: '/admin/marking-schemes' },

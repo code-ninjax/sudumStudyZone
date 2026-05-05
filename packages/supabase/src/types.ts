@@ -7,6 +7,7 @@ export interface Profile {
   full_name: string | null;
   role: 'admin' | 'student';
   faculty: string | null;
+  faculty_id: string | null;
   department: string | null;
   department_id: string | null;
   level: string | null;

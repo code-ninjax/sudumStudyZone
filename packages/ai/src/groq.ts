@@ -1,10 +1,10 @@
 import Groq from 'groq-sdk';
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
 export async function getGroqChatCompletion(userMessage: string, history: { role: 'user' | 'assistant' | 'system', content: string }[] = []) {
+  const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY,
+  });
+
   const systemPrompt = {
     role: 'system' as const,
     content: `You are the Sudum Study AI Assistant, a high-performance academic mentor for students at Sudum Study Zone. 

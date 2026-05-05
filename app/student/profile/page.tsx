@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/packages/supabase/src/client'
 import type { Profile } from '@/packages/supabase/src/types'
-import { User, Hash, Building2, GraduationCap, Save, AlertCircle, CheckCircle, LogOut, Camera, ShieldCheck, Calendar, Activity } from 'lucide-react'
+import { User, Hash, Building2, GraduationCap, Save, AlertCircle, CheckCircle, LogOut, Camera, ShieldCheck, Calendar, Activity, Layers3 } from 'lucide-react'
 import { DashboardSkeleton } from '@/components/SkeletonLoader'
 
 export default function StudentProfilePage() {
@@ -15,8 +15,8 @@ export default function StudentProfilePage() {
     fullName: '',
     email: '',
     matricNumber: '',
-    faculty: '',
-    department: '',
+    faculty_id: '',
+    department_id: '',
     level: '',
   })
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -24,6 +24,8 @@ export default function StudentProfilePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [departments, setDepartments] = useState<{id: string, name: string, faculty_id: string}[]>([])
+  const [faculties, setFaculties] = useState<{id: string, name: string}[]>([])
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -48,8 +50,8 @@ export default function StudentProfilePage() {
             fullName: data.full_name || '',
             email: user?.email || '',
             matricNumber: data.matric_number || '',
-            faculty: data.faculty || '',
-            department: data.department || '',
+            faculty_id: data.faculty_id || '',
+            department_id: data.department_id || '',
             level: data.level || '',
           })
         }
@@ -67,6 +69,34 @@ export default function StudentProfilePage() {
     }
   }, [user, authLoading])
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: depsData } = await supabase.from('departments').select('id, name, faculty_id').order('name')
+      if (depsData) setDepartments(depsData)
+      
+      const { data: facsData } = await supabase.from('faculties').select('id, name').order('name')
+      if (facsData) setFaculties(facsData)
+    }
+    fetchData()
+  }, [])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    
+    if (name === 'faculty_id') {
+      setFormData((current) => ({
+        ...current,
+        [name]: value,
+        department_id: '',
+      }))
+    } else {
+      setFormData((current) => ({
+        ...current,
+        [name]: value,
+      }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -81,8 +111,8 @@ export default function StudentProfilePage() {
         .update({
           full_name: formData.fullName,
           matric_number: formData.matricNumber,
-          faculty: formData.faculty,
-          department: formData.department,
+          faculty_id: formData.faculty_id || null,
+          department_id: formData.department_id || null,
           level: formData.level,
           updated_at: new Date().toISOString(),
         })
@@ -203,22 +233,43 @@ export default function StudentProfilePage() {
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Faculty</label>
                   <div className="relative group">
                     <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-light transition-colors" />
-                    <input 
-                      className="w-full bg-gray-50/50 dark:bg-gray-800/50 border-0 rounded-2xl pl-14 pr-6 py-5 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all" 
-                      value={formData.faculty} 
-                      onChange={e => setFormData({...formData, faculty: e.target.value})} 
-                    />
+                    <select
+                      name="faculty_id"
+                      value={formData.faculty_id}
+                      onChange={handleChange}
+                      className="w-full appearance-none bg-gray-50/50 dark:bg-gray-800/50 border-0 rounded-2xl pl-14 pr-6 py-5 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all"
+                    >
+                      <option value="" disabled>Select a faculty</option>
+                      {faculties.map((fac) => (
+                        <option key={fac.id} value={fac.id}>
+                          {fac.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Department</label>
                   <div className="relative group">
                     <GraduationCap className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-light transition-colors" />
-                    <input 
-                      className="w-full bg-gray-50/50 dark:bg-gray-800/50 border-0 rounded-2xl pl-14 pr-6 py-5 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all" 
-                      value={formData.department} 
-                      onChange={e => setFormData({...formData, department: e.target.value})} 
-                    />
+                    <select
+                      name="department_id"
+                      value={formData.department_id}
+                      onChange={handleChange}
+                      disabled={!formData.faculty_id}
+                      className="w-full appearance-none bg-gray-50/50 dark:bg-gray-800/50 border-0 rounded-2xl pl-14 pr-6 py-5 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="" disabled>
+                        {formData.faculty_id ? 'Select a department' : 'Select a faculty first'}
+                      </option>
+                      {departments
+                        .filter((dept) => dept.faculty_id === formData.faculty_id)
+                        .map((dept) => (
+                          <option key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </option>
+                        ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -226,11 +277,12 @@ export default function StudentProfilePage() {
               <div className="space-y-3">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Level</label>
                 <div className="relative group">
-                  <GraduationCap className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-light transition-colors" />
+                  <Layers3 className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-light transition-colors" />
                   <select
-                    className="w-full appearance-none bg-gray-50/50 dark:bg-gray-800/50 border-0 rounded-2xl pl-14 pr-6 py-5 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all"
+                    name="level"
                     value={formData.level}
-                    onChange={e => setFormData({...formData, level: e.target.value})}
+                    onChange={handleChange}
+                    className="w-full appearance-none bg-gray-50/50 dark:bg-gray-800/50 border-0 rounded-2xl pl-14 pr-6 py-5 font-bold text-sm focus:ring-2 focus:ring-primary-light transition-all"
                   >
                     <option value="">Select level</option>
                     <option value="100L">100L</option>
