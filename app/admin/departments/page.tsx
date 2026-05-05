@@ -59,11 +59,11 @@ export default function DepartmentsHub() {
     try {
       const { data, error } = await supabase
         .from('departments')
-        .select('id, name, code, faculty_id')
+        .select('*')
         .order('name', { ascending: true })
 
       if (error) throw error
-      setDepartments(data || [])
+      setDepartments((data || []) as Department[])
     } catch (err: any) {
       console.error('Error fetching departments:', err.message)
     } finally {
@@ -123,7 +123,7 @@ export default function DepartmentsHub() {
       await fetchDepartments()
       setTimeout(() => {
         setSuccess(false)
-        setFormData({ name: '', code: '' })
+        setFormData({ name: '', code: '', faculty_id: '' })
         setView('list')
       }, 1500)
     } catch (err: any) {
