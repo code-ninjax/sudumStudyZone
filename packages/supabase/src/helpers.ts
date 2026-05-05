@@ -60,7 +60,11 @@ export async function getAllStudents(): Promise<Profile[]> {
   
   const { data, error } = await client
     .from("profiles")
-    .select("*")
+    .select(`
+      *,
+      faculties:faculty_id(name),
+      departments:department_id(name)
+    `)
     .eq("role", "student")
     .order("full_name", { ascending: true });
 
@@ -70,7 +74,15 @@ export async function getAllStudents(): Promise<Profile[]> {
   }
 
   console.log('Successfully fetched students:', data?.length, 'students');
-  return data || [];
+  
+  // Transform the data to have faculty and department names directly
+  const transformedData = data?.map((profile: any) => ({
+    ...profile,
+    faculty: profile.faculties?.name || null,
+    department: profile.departments?.name || null,
+  })) || [];
+  
+  return transformedData;
 }
 
 /**

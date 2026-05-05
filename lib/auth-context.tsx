@@ -18,6 +18,7 @@ interface AuthContextType {
       password: string
       fullName: string
       department_id: string
+      faculty_id: string
       level: string
       matricNumber: string
       redirectTo?: string
@@ -135,6 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password,
     fullName,
     department_id,
+    faculty_id,
     level,
     matricNumber,
     redirectTo,
@@ -143,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string
     fullName: string
     department_id: string
+    faculty_id: string
     level: string
     matricNumber: string
     redirectTo?: string
@@ -155,6 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data: {
           full_name: fullName,
           department_id,
+          faculty_id,
           level,
           matric_number: matricNumber,
           role: 'student', // Default role for public signups

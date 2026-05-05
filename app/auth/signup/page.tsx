@@ -30,11 +30,13 @@ const levels = ['100L', '200L', '300L', '400L', '500L']
 
 export default function SignupPage() {
   const [step, setStep] = useState<1 | 2>(1)
-  const [departments, setDepartments] = useState<{id: string, name: string}[]>([])
+  const [departments, setDepartments] = useState<{id: string, name: string, faculty_id: string}[]>([])
+  const [faculties, setFaculties] = useState<{id: string, name: string}[]>([])
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     department_id: '',
+    faculty_id: '',
     level: '100L',
     matricNumber: '',
     password: '',
@@ -54,17 +56,33 @@ export default function SignupPage() {
 
   useEffect(() => {
     const fetchDeps = async () => {
-      const { data } = await supabase.from('departments').select('id, name').order('name')
-      if (data) setDepartments(data)
+      const { data: depsData } = await supabase.from('departments').select('id, name, faculty_id').order('name')
+      if (depsData) setDepartments(depsData)
+    }
+    const fetchFaculties = async () => {
+      const { data: facsData } = await supabase.from('faculties').select('id, name').order('name')
+      if (facsData) setFaculties(facsData)
     }
     fetchDeps()
+    fetchFaculties()
   }, [])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData((current) => ({
-      ...current,
-      [e.target.name]: e.target.value,
-    }))
+    const { name, value } = e.target
+    
+    // If faculty changes, reset department selection
+    if (name === 'faculty_id') {
+      setFormData((current) => ({
+        ...current,
+        [name]: value,
+        department_id: '', // Reset department when faculty changes
+      }))
+    } else {
+      setFormData((current) => ({
+        ...current,
+        [name]: value,
+      }))
+    }
     setError(null)
   }
 
@@ -88,8 +106,8 @@ export default function SignupPage() {
   }
 
   const validateAcademicStep = () => {
-    if (!formData.department_id || !formData.level || !formData.matricNumber.trim()) {
-      setError('Department, level, and matric number are required.')
+    if (!formData.department_id || !formData.faculty_id || !formData.level || !formData.matricNumber.trim()) {
+      setError('Faculty, department, level, and matric number are required.')
       return false
     }
 
@@ -120,6 +138,7 @@ export default function SignupPage() {
         password: formData.password,
         fullName: formData.fullName.trim(),
         department_id: formData.department_id,
+        faculty_id: formData.faculty_id,
         level: formData.level,
         matricNumber: formData.matricNumber.trim(),
         redirectTo: `${window.location.origin}/auth/verify`,
@@ -343,6 +362,31 @@ export default function SignupPage() {
                 <div className="grid gap-5 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-gray-500">
+                      Faculty
+                    </label>
+                    <div className="relative">
+                      <Building2 className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <select
+                        name="faculty_id"
+                        value={formData.faculty_id}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                        className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-3.5 sm:py-4 text-sm font-bold text-gray-900 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-green-400 dark:focus:ring-green-400/10"
+                      >
+                        <option value="" disabled className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                          Select a faculty
+                        </option>
+                        {faculties.map((fac) => (
+                          <option key={fac.id} value={fac.id} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                            {fac.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.24em] text-gray-500">
                       Department
                     </label>
                     <div className="relative">
@@ -351,21 +395,26 @@ export default function SignupPage() {
                         name="department_id"
                         value={formData.department_id}
                         onChange={handleChange}
-                        disabled={loading}
+                        disabled={loading || !formData.faculty_id}
                         required
                         className="w-full appearance-none rounded-2xl border border-gray-200 bg-white px-12 py-3.5 sm:py-4 text-sm font-bold text-gray-900 outline-none transition focus:border-green-500 focus:ring-4 focus:ring-green-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-green-400 dark:focus:ring-green-400/10"
                       >
                         <option value="" disabled className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                          Select a department
+                          {formData.faculty_id ? 'Select a department' : 'Select a faculty first'}
                         </option>
-                        {departments.map((dept) => (
-                          <option key={dept.id} value={dept.id} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                            {dept.name}
-                          </option>
-                        ))}
+                        {departments
+                          .filter((dept) => dept.faculty_id === formData.faculty_id)
+                          .map((dept) => (
+                            <option key={dept.id} value={dept.id} className="text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                              {dept.name}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </div>
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-2">
                   <AuthField
                     icon={Hash}
                     label="Matric Number"
