@@ -150,6 +150,9 @@ export default function SignupPage() {
       }
 
       setSuccess(true)
+      setTimeout(() => {
+        router.push('/student')
+      }, 2000)
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.')
     } finally {
@@ -162,61 +165,23 @@ export default function SignupPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4 py-8 sm:py-12">
         <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center">
           <Card className="w-full rounded-[2rem] sm:rounded-[3.5rem] border border-gray-200/60 bg-white/95 p-6 sm:p-8 shadow-[0_20px_60px_rgba(22,163,74,0.12)] backdrop-blur xl:p-12 dark:border-gray-800 dark:bg-gray-900/95 dark:shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
-            <div className="grid gap-8 lg:gap-10 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
-              <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-green-700 dark:border-green-900/50 dark:bg-green-950/30 dark:text-green-400">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Account Created
+            <div className="flex flex-col items-center justify-center text-center py-12">
+              <div className="relative mb-6">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 rounded-full flex items-center justify-center shadow-lg animate-scale-in">
+                  <CheckCircle2 className="w-12 h-12 sm:w-14 sm:h-14 text-white" strokeWidth={2.5} />
                 </div>
-                <h1 className="max-w-xl text-3xl sm:text-4xl font-black uppercase tracking-tight text-gray-900 dark:text-white md:text-5xl">
-                  Verify your email to finish the signup flow.
-                </h1>
-                <p className="mt-5 max-w-xl text-base font-medium leading-7 text-gray-600 dark:text-gray-400">
-                  We sent a verification link to <span className="font-black text-green-600 dark:text-green-400">{formData.email}</span>.
-                  Your student profile has been created with your academic information.
-                </p>
-
-                <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800/50">
-                    <MailOpen className="mb-3 h-5 w-5 text-green-600 dark:text-green-400" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500">Step 1</p>
-                    <p className="mt-2 text-sm font-bold text-gray-900 dark:text-white">Open your inbox.</p>
-                  </div>
-                  <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800/50">
-                    <ShieldCheck className="mb-3 h-5 w-5 text-green-600 dark:text-green-400" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500">Step 2</p>
-                    <p className="mt-2 text-sm font-bold text-gray-900 dark:text-white">Verify the account.</p>
-                  </div>
-                  <div className="rounded-[1.75rem] border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800/50">
-                    <ArrowRight className="mb-3 h-5 w-5 text-green-600 dark:text-green-400" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500">Step 3</p>
-                    <p className="mt-2 text-sm font-bold text-gray-900 dark:text-white">Sign in and continue.</p>
-                  </div>
-                </div>
+                <div className="absolute inset-0 w-20 h-20 sm:w-24 sm:h-24 bg-green-500/30 dark:bg-green-600/30 rounded-full animate-ping" />
               </div>
-
-              <div className="rounded-[2rem] sm:rounded-[2.25rem] bg-gradient-to-br from-gray-900 to-gray-950 p-6 sm:p-8 text-white shadow-2xl border border-gray-800">
-                <div className="mb-6 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-[1.5rem] bg-green-500/20">
-                  <MailOpen className="h-7 w-7 sm:h-8 sm:w-8 text-green-400" />
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight">Student Profile Created</h2>
-                <div className="mt-8 rounded-[1.75rem] border border-gray-700 bg-gray-800/50 p-5">
-                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-400">Student Summary</p>
-                  <p className="mt-3 text-sm font-bold text-white">{formData.fullName}</p>
-                  <p className="mt-2 text-sm text-gray-300">Department Selected</p>
-                  <p className="mt-1 text-sm text-gray-300">{formData.matricNumber}</p>
-                  <p className="mt-4 inline-flex rounded-full bg-green-500/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-green-400">
-                    {formData.level}
-                  </p>
-                </div>
-
-                <Link
-                  href="/auth/login"
-                  className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-green-600 px-6 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-white transition-transform hover:scale-[1.02] hover:bg-green-700"
-                >
-                  Go To Login
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+              <h1 className="max-w-xl text-3xl sm:text-4xl font-black uppercase tracking-tight text-gray-900 dark:text-white md:text-5xl">
+                Account Created!
+              </h1>
+              <p className="mt-5 max-w-xl text-base font-medium leading-7 text-gray-600 dark:text-gray-400">
+                Welcome to Sudum Study Zone, <span className="font-black text-green-600 dark:text-green-400">{formData.fullName}</span>.
+                Your academic profile is ready. Redirecting you to your dashboard...
+              </p>
+              <div className="mt-8 flex items-center gap-3">
+                <div className="w-6 h-6 border-2 border-green-500 dark:border-green-400 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm font-bold text-gray-500 dark:text-gray-400">Loading dashboard...</span>
               </div>
             </div>
           </Card>
@@ -256,8 +221,8 @@ export default function SignupPage() {
               />
               <StepPreview
                 index="03"
-                title="Complete Signup"
-                text="Submit your details and verify your email to activate your account."
+                title="Access Dashboard"
+                text="Submit your details and access your student dashboard immediately."
               />
             </div>
           </div>
